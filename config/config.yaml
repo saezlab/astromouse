@@ -1,0 +1,17 @@
+# Datasets
+neurips2021:
+    organism: "human"
+    data: "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE194122&format=file&file=GSE194122%5Fopenproblems%5Fneurips2021%5Fmultiome%5FBMMC%5Fprocessed%2Eh5ad%2Egz"
+    trajectories:
+        blood:
+            celltypes: 'HSC;MKE_prog;Proerythroblast;Erythroblast;Normoblast'
+            celloracle:
+                min_count: 2000
+                max_count: 15000
+                thr_coaccess: 0.8
+                fpr: 0.02
+                thr_motif_score: 10
+                thr_edge_pval: 0.001
+                thr_top_edges: 2000
+
+

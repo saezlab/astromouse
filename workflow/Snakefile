@@ -1,0 +1,19 @@
+from snakemake.utils import min_version
+min_version("6.0")
+
+configfile: "config/config.yaml"
+
+module general:
+    snakefile: "rules/general.smk"
+    config: config
+
+use rule * from general
+
+module celloracle:
+    snakefile: "rules/celloracle.smk"
+    config: config
+
+use rule * from celloracle
+
+# snakemake --profile config/slurm/ celloracle
+# conda env update --file local.yml --prune
