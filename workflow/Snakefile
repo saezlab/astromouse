@@ -15,5 +15,11 @@ module celloracle:
 
 use rule * from celloracle
 
+module preprocessing:
+    snakefile: "rules/preprocessing.smk"
+    config: config
+
+use rule * from preprocessing as PP_*
+
 # snakemake --profile config/slurm/ celloracle
 # conda env update --file local.yml --prune

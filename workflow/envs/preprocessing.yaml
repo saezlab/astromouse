@@ -1,0 +1,17 @@
+name: r_seurat
+channels:
+  # - defaults
+  - conda-forge
+  - bioconda
+dependencies:
+  - r
+  - r-devtools
+  - r-tidyverse
+  - r-seurat
+  - bioconductor-singlecellexperiment 
+  - bioconductor-zellkonverter
+  - r-seuratobject
+  - r-seuratdisk
+  - bioconductor-genomeinfodb
+  - bioconductor-genomeinfodbdata
+  - r-signac
