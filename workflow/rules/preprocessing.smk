@@ -19,3 +19,13 @@ rule MO_seurat_to_h5ad:
         "../envs/preprocessing.yml"
     script:
         "../scripts/preprocessing/RDS_to_h5ad.R"
+
+rule MO_seurat_to_h5ad:
+    input:
+        MO_seurat_to_h5ad.output
+    output:
+        muad = 'data/working/MO/{tissue}.h5mu'
+    conda:
+        "../envs/preprocessing.yml"
+    script:
+        "../scripts/preprocessing/RDS_to_h5ad.R"
