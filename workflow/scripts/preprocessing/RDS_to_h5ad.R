@@ -27,17 +27,17 @@ if(grepl(".h5ad$", output_fp, ignore.case = TRUE)){
   assays <- c('RNA', 'ATAC', 'SCT', 'SCT_CC', 'chromvar')
   
   lapply(assays, function (x){
-    print('INFO: converting assay:', x)
+    cat('INFO: converting assay:', as.character(x), '\n')
     temp <- data
     temp@active.assay <- x
     keep <- grepl(paste('^',paste(paste0(x, c('_pca', '_harmony', '_umap')), collapse = '$|^'), '$', sep = ''), names(temp@reductions))
     temp@reductions[!keep] <- NULL
     
-    print('INFO: with reductions', temp@reductions)
+    cat('INFO: with reductions', temp@reductions, '\n')
 
-    temp <- as.SingleCellExperiment(temp)
-    
-    writeH5AD(temp, file = paste(output_fp, .Platform$file.sep, gsub('_', '-', x), '.h5ad', sep = '' ))
+    # temp <- as.SingleCellExperiment(temp)
+    # 
+    # writeH5AD(temp, file = paste(output_fp, .Platform$file.sep, gsub('_', '-', x), '.h5ad', sep = '' ))
     
   })
   
