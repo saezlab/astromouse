@@ -22,7 +22,7 @@ rule MO_seurat_to_h5ad:
 
 rule MO_h5ad_to_h5mu:
     input:
-        MO_seurat_to_h5ad.output
+        rules.MO_seurat_to_h5ad.output
     output:
         muad = 'data/working/MO/{tissue}.h5mu'
     conda:
