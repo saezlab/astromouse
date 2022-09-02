@@ -20,12 +20,12 @@ rule MO_seurat_to_h5ad:
     script:
         "../scripts/preprocessing/RDS_to_h5ad.R"
 
-rule MO_seurat_to_h5ad:
+rule MO_h5ad_to_h5mu:
     input:
         MO_seurat_to_h5ad.output
     output:
         muad = 'data/working/MO/{tissue}.h5mu'
     conda:
-        "../envs/preprocessing.yml"
+        "../envs/astromouse.yml"
     script:
-        "../scripts/preprocessing/RDS_to_h5ad.R"
+        "../scripts/preprocessing/MO_to_mudata.py"
