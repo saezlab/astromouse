@@ -33,7 +33,7 @@ if(grepl(".h5ad$", output_fp, ignore.case = TRUE)){
     keep <- grepl(paste('^',paste(paste0(x, c('_pca', '_harmony', '_umap')), collapse = '$|^'), '$', sep = ''), names(temp@reductions))
     temp@reductions[!keep] <- NULL
     
-    cat('INFO: with reductions', temp@reductions, '\n')
+    cat('INFO: with reductions', names(temp@reductions), '\n')
 
     # temp <- as.SingleCellExperiment(temp)
     # 
