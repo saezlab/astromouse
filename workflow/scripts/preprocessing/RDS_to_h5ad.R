@@ -35,9 +35,9 @@ if(grepl(".h5ad$", output_fp, ignore.case = TRUE)){
     
     cat('INFO: with reductions', names(temp@reductions), '\n')
 
-    # temp <- as.SingleCellExperiment(temp)
-    # 
-    # writeH5AD(temp, file = paste(output_fp, .Platform$file.sep, gsub('_', '-', x), '.h5ad', sep = '' ))
+    temp <- as.SingleCellExperiment(temp)
+
+    writeH5AD(temp, file = paste(output_fp, .Platform$file.sep, gsub('_', '-', x), '.h5ad', sep = '' ))
     
   })
   
