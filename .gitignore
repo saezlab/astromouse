@@ -5,6 +5,10 @@ __pycache__/
 
 #Data folders
 data/
+logs/
+
+#Snakemake stuff
+.snakemake/
 
 # C extensions
 *.so
