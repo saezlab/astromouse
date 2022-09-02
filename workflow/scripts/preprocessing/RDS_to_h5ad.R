@@ -6,8 +6,8 @@ if(exists("snakemake")){
   input_fp = normalizePath(snakemake@input$data)
   output_fp <- snakemake@output[[1]]
 }else{
-  input_fp = normalizePath("data/original/MO/MO_brain_annotated.rds")
-  output_fp <- "data/working/MO/MO_brain_annotated.h5ad"
+  input_fp = normalizePath("data/original/ST/ST_brain_annotated.rds")
+  output_fp <- "data/working/MO/MO_brain_annotated"
 }
 
 data <- readRDS(input_fp)
@@ -24,13 +24,13 @@ if(grepl(".h5ad$", output_fp, ignore.case = TRUE)){
   }
   dir.create(output_fp)
   
-  assays <- c('RNA', 'ATAC', 'SCT', 'SCT_CC', 'chromvar')
+  assays <- base::intersect(names(data@assays), c('RNA', 'ATAC', 'SCT', 'SCT_CC', 'chromvar'))
   
   lapply(assays, function (x){
     cat('INFO: converting assay:', as.character(x), '\n')
     temp <- data
     temp@active.assay <- x
-    keep <- grepl(paste('^',paste(paste0(x, c('_pca', '_harmony', '_umap')), collapse = '$|^'), '$', sep = ''), names(temp@reductions))
+    keep <- grepl(paste('^',paste(c(paste(paste0(x, c('_pca', '_harmony', '_umap'))), 'pca', 'harmony', 'umap'), collapse = '$|^'), '$', sep = ''), names(temp@reductions))
     temp@reductions[!keep] <- NULL
     
     cat('INFO: with reductions', names(temp@reductions), '\n')
