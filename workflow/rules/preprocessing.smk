@@ -46,7 +46,7 @@ rule ST_combine_to_h5ad:
     input:
         rules.ST_seurat_to_h5ad.output
     output:
-        muad = 'data/working/ST/{tissue}.h5mu'
+        muad = 'data/working/ST/{tissue}.h5ad'
     conda:
         "../envs/astromouse.yml"
     script:
