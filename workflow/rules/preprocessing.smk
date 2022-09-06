@@ -67,6 +67,6 @@ rule combine_visium:
     conda:
         "../envs/astromouse.yml"
     resources:
-        mem_mb=30000
+        mem_mb=40000
     script:
         '../scripts/preprocessing/annData_w_images.py'
