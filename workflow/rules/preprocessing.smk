@@ -1,3 +1,4 @@
+from glob import glob
 # rule ST_seurat_to_h5ad:
 #     input:
 #         data = 'data/original/ST/ST_{tissue}_annotated.rds'
@@ -52,10 +53,15 @@ rule ST_combine_to_h5ad:
     script:
         "../scripts/preprocessing/ST_to_adata.py"
 
+def samples_from_tissue(wildcards):
+    folders = sorted(glob(os.path.join('data/original/ST/visium_data_{0}/'.format(wildcards.tissue), '*')))
+    sample_paths = [os.path.join(folder, 'filtered_feature_bc_matrix.h5') for folder in folders]
+    return sample_paths
+
 rule combine_visium:
     input:
         'data/working/ST/{tissue}.h5ad',
-        expand('data/original/ST/visium_data_{{tissue}}/{sample}/filtered_feature_bc_matrix.h5')
+        samples_from_tissue
     output:
         'data/working/ST/{tissue}_wImages.h5ad'
     conda:
