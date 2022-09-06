@@ -51,3 +51,14 @@ rule ST_combine_to_h5ad:
         "../envs/astromouse.yml"
     script:
         "../scripts/preprocessing/ST_to_adata.py"
+
+rule combine_visium:
+    input:
+        'data/working/ST/{tissue}.h5ad',
+        expand('data/original/ST/visium_data_{{tissue}}/{sample}/filtered_feature_bc_matrix.h5')
+    output:
+        'data/working/ST/{tissue}_wImages.h5ad'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        '../scripts/preprocessing/annData_w_images.py'
