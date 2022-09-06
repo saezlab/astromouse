@@ -7,7 +7,7 @@ from glob import glob
 
 # Define input and output files
 if 'snakemake' in locals():
-    tissue = snakemake.wilcards[0]
+    tissue = snakemake.wildcards[0]
     filtered_adata = snakemake.input[0]
     sample_paths = snakemake.input[1:]
 else:
