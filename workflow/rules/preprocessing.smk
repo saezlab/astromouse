@@ -66,5 +66,7 @@ rule combine_visium:
         'data/working/ST/{tissue}_wImages.h5ad'
     conda:
         "../envs/astromouse.yml"
+    resources:
+        mem_mb=30000
     script:
         '../scripts/preprocessing/annData_w_images.py'
