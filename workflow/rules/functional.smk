@@ -4,7 +4,7 @@ rule brain_pathways:
     output:
         'plots/functional/brain_pathways.pdf'
     params:
-        normalisation = 'log1p' #or SCT
+        normalisation = 'log1p', #or SCT
         top_genes = 300
     conda:
         "../envs/astromouse.yml"
