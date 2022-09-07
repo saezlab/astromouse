@@ -8,7 +8,5 @@ rule brain_pathways:
         top_genes = 300
     conda:
         "../envs/astromouse.yml"
-    # resources:
-    #     mem_mb=40000
     script:
         '../scripts/preprocessing/plots_pathways_brain.py'
