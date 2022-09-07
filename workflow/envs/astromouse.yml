@@ -25,5 +25,6 @@ dependencies:
     - pysam
     - mofapy2
     - decoupler
+    - omnipath
     - git+https://github.com/settylab/Palantir@removeTSNE
     - git+https://github.com/dpeerlab/SEACells
