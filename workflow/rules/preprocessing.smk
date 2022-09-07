@@ -53,6 +53,10 @@ rule ST_combine_to_h5ad:
     script:
         "../scripts/preprocessing/ST_to_adata.py"
 
+# Combines the ST data into one AnnData object
+# the .raw contains the original count data -> WITHOUT ANY FILTERING of spots or genes
+# the .X matrix contains counts based on the provided Seurat object, with spots and genes filtered
+# the SCT layer countains SCT transformed data using Seurat#s SCTtransformt method
 def samples_from_tissue(wildcards):
     folders = sorted(glob(os.path.join('data/original/ST/visium_data_{0}/'.format(wildcards.tissue), '*')))
     sample_paths = [os.path.join(folder, 'filtered_feature_bc_matrix.h5') for folder in folders]
