@@ -21,5 +21,11 @@ module preprocessing:
 
 use rule * from preprocessing as PP_*
 
+module functional:
+    snakefile: "rules/functional.smk"
+    config: config
+
+use rule * from preprocessing as fun_*
+
 # snakemake --profile config/slurm/ celloracle
 # conda env update --file local.yml --prune

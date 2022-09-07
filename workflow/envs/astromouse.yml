@@ -24,5 +24,6 @@ dependencies:
     - muon
     - pysam
     - mofapy2
+    - decoupler
     - git+https://github.com/settylab/Palantir@removeTSNE
     - git+https://github.com/dpeerlab/SEACells
