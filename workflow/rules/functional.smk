@@ -9,4 +9,4 @@ rule brain_pathways:
     conda:
         "../envs/astromouse.yml"
     script:
-        '../scripts/preprocessing/plots_pathways_brain.py'
+        '../scripts/functional/plots_pathways_brain.py'
