@@ -1,4 +1,4 @@
-rule brain_pathways:
+rule plot_pathways:
     input:
         'data/working/ST/{tissue}_wImages.h5ad'
     output:
