@@ -1,12 +1,12 @@
 rule brain_pathways:
     input:
-        'data/working/ST/brain_wImages.h5ad'
+        'data/working/ST/{tissue}_wImages.h5ad'
     output:
-        'plots/functional/brain_pathways.pdf'
+        'plots/functional/{tissue}_pathways.pdf'
     params:
         normalisation = 'log1p', #or SCT
         top_genes = 300
     conda:
         "../envs/astromouse.yml"
     script:
-        '../scripts/functional/plots_pathways_brain.py'
+        '../scripts/functional/plots_pathways.py'
