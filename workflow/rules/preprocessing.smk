@@ -37,7 +37,7 @@ rule ST_extract_deconv:
     input:
         data = 'data/original/ST/ST_brain_deconvoluted.rds'
     output:
-        csv = 'data/original/ST/ST_brain_deconvoluted.csv'
+        csv = 'data/original/ST/brain_deconvoluted.csv'
     params:
         assay = config['deconvolution'].get("assay", 'hvg2000')
     # resources:
