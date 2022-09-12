@@ -25,7 +25,7 @@ rule ST_seurat_to_h5ad:
     input:
         data = 'data/original/ST/ST_{tissue}_annotated.rds'
     output:
-        h5ad = directory('data/working/ST/{tissue}')
+        h5ad = directory('data/working/ST/{tissue}_annotated')
     resources:
         mem_mb=30000
     conda:
@@ -37,7 +37,7 @@ rule ST_extract_deconv:
     input:
         data = 'data/original/ST/ST_brain_deconvoluted.rds'
     output:
-        csv = 'data/original/ST/brain_deconvoluted.csv'
+        csv = 'data/working/ST/ST_brain_deconvoluted.csv'
     params:
         assay = config['deconvolution'].get("assay", 'hvg2000')
     # resources:
