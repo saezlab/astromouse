@@ -5,8 +5,8 @@ import decoupler as dc
 
 # %%
 if 'snakemake' in locals():
-    tissue = snakemake.wilcards[0]
-    network = snakemake.wilcards[1]
+    tissue = snakemake.wildcards[0]
+    network = snakemake.wildcards[1]
     adata_fp = snakemake.input[0]
     output_fp = snakemake.output[0]
     normalisation = snakemake.params[0]
