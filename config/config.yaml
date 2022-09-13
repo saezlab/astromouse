@@ -16,3 +16,8 @@ neurips2021:
 
 deconvolution:
     assay: 'hvg2000'
+
+functional:
+    normalisation: 'log1p' #or SCT
+    pathways_top_gene: 300
+    pathways_method: 'mlm'
