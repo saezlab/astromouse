@@ -27,5 +27,11 @@ module functional:
 
 use rule * from functional as fun_*
 
+module misty:
+    snakefile: "rules/misty.smk"
+    config: config
+
+use rule * from misty as misty_*
+
 # snakemake --profile config/slurm/ celloracle
 # conda env update --file local.yml --prune

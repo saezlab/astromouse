@@ -13,7 +13,7 @@ rule plot_pathways:
     script:
         '../scripts/functional/plots_pathways.py'
 
-rule get_pathways:
+rule get_PDactivities:
     input:
         data = 'data/working/ST/{tissue}_wImages.h5ad'
     output:

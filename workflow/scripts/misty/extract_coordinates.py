@@ -23,3 +23,5 @@ coords[['x','y']] = pd.DataFrame(adata.obsm['spatial'], columns=['x', 'y'], inde
 coords.to_csv(output_fp)
 
 
+
+# %%
