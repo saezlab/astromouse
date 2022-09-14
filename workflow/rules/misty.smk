@@ -22,7 +22,7 @@ rule get_func_views:
 
 rule get_deconv_views:
     input:
-        coords = 'data/working/ST/Misty/{tissue}_coordinates.csv',
+        coords = 'data/working/ST/Misty/brain_coordinates.csv',
         deconv ='data/working/ST/ST_brain_deconvoluted.csv'
     output:
         view = 'data/working/ST/Misty/{sample}/brain_CT_view.rds'
@@ -30,4 +30,3 @@ rule get_deconv_views:
         "../envs/misty.yml"
     script:
         "../scripts/misty/make_CT_views.R"
-
