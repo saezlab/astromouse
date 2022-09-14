@@ -4,7 +4,7 @@ import pandas as pd
 
 # %%
 if 'snakemake' in locals():
-    tissue = snakemake.wilcards[0]
+    tissue = snakemake.wildcards[0]
     adata_fp = snakemake.input[0]
     output_fp = snakemake.output[0]
 else:
