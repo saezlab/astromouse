@@ -5,7 +5,7 @@ channels:
   - defaults
 dependencies:
   - r-base>=4.1
-  - r-remotes
+  - r-devtools
   - r-tidyverse
   - r-purrr
   - r-distances

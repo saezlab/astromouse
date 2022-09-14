@@ -1,1 +1,1 @@
-remotes::install_github("saezlab/mistyR")
+devtools::install_github("saezlab/mistyR")
