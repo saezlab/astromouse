@@ -11,15 +11,13 @@ if(exists("snakemake")){
   tissue <- snakemake@wildcards[[1]]
   
   coord_fp = normalizePath(snakemake@input$coords)
-  pathways_fp <- normalizePath(snakemake@input$pathways)
-  tf_fp <- normalizePath(snakemake@input$TFs)
+  deconv_fp <- normalizePath(snakemake@input$deconv)
   sample <- basename(dirname(snakemake@output[[1]]))
 }else{
   tissue <- 'brain'
   
   coord_fp <- normalizePath(paste('data/working/ST/Misty/', tissue, '_coordinates.csv', sep=""))
-  pathways_fp <- normalizePath(paste('data/working/ST/functional/', tissue, '_activities_pathways.csv', sep=""))
-  tf_fp <- normalizePath(paste('data/working/ST/functional/', tissue, '_activities_TFs.csv', sep=""))
+  deconv_fp <- normalizePath(paste('data/working/ST/ST_', tissue, '_deconvoluted.csv', sep=""))
   sample <- "Sample_158_A1"
 }
 
@@ -27,7 +25,7 @@ if(exists("snakemake")){
 
 # load data ---------------------------------------------------------------
 
-datas_fp <- list(coord = coord_fp, pathways = pathways_fp, TFs = tf_fp)
+datas_fp <- list(coord = coord_fp, CT = deconv_fp)
 
 datas <- lapply(datas_fp, function(fp){
   data <- read_csv(fp)
@@ -51,7 +49,7 @@ datas[2:length(datas)] <- lapply(datas[2:length(datas)], function(data){
 
 centroid <- round(colMeans(datas$coord %>% select(array_col, array_row)))
 spots <- datas$coord %>% filter(array_col %in% (centroid[1]-18):(centroid[1]+18) &  array_row %in% (centroid[2]-18):(centroid[2]+18)) %>% 
-                                  select(x,y)
+  select(x,y)
 
 #calculate the distance between selected spots
 dM <- dist(spots, diag = F, upper = F) %>% unique() %>% sort()
@@ -68,15 +66,10 @@ cat('Using', as.character(2*radius), 'as l parameter in paraview creation\n')
 
 # make views --------------------------------------------------------------
 
-path.view <- create_initial_view(datas$pathways)
-
-TF.view <- create_initial_view(datas$TFs) %>% add_paraview(datas$coord %>% select(x,y), l = radius * 2)
-TF.view <- within(TF.view, rm(misty.uniqueid, intraview))
-
-misty.views <- path.view %>% add_views(new.views = TF.view)
+CT.view <- create_initial_view(datas$CT) %>% add_paraview(datas$coord %>% select(x,y), l = radius * 2)
 
 if(exists("snakemake")){
-  saveRDS(misty.views, snakemake@output[[1]])
+  saveRDS(CT.view, snakemake@output[[1]])
 }
 
 
