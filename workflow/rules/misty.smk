@@ -10,9 +10,9 @@ rule get_coords:
 
 rule get_func_views:
     input:
-        coords = 'data/working/ST/Misty/{tissue}_coordinates.csv',
-        pathways ='data/working/ST/functional/{tissue}_activities_pathways.csv',
-        TFs = 'data/working/ST/functional/{tissue}_activities_TFs.csv'
+        'data/working/ST/Misty/{tissue}_coordinates.csv',
+        'data/working/ST/functional/{tissue}_activities_pathways.csv',
+        'data/working/ST/functional/{tissue}_activities_TFs.csv'
     output:
         view = 'data/working/ST/Misty/{sample}/{tissue}_functional_view.rds'
     conda:
@@ -22,8 +22,8 @@ rule get_func_views:
 
 rule get_deconv_views:
     input:
-        coords = 'data/working/ST/Misty/brain_coordinates.csv',
-        deconv ='data/working/ST/ST_brain_deconvoluted.csv'
+        'data/working/ST/Misty/brain_coordinates.csv',
+        'data/working/ST/ST_brain_deconvoluted.csv'
     output:
         view = 'data/working/ST/Misty/{sample}/brain_CT_view.rds'
     conda:
