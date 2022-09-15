@@ -30,3 +30,20 @@ rule get_deconv_views:
         "../envs/misty.yml"
     script:
         "../scripts/misty/make_views.R"
+
+rule run_func_views:
+    input:
+        view = 'data/working/ST/Misty/{tissue}/{sample}/{view_type}_view.rds'
+    output: 
+        directory('data/working/ST/Misty/{tissue}/{sample}/{view_type}_misty_model')
+    params:
+        seed = config['misty'].get("random_seed", 42)
+    conda:
+        "../envs/misty.yml"
+    threads: 6
+    resources:
+        mem_mb=25000,
+        disk_mb=1000,
+        time='12:00:00'
+    script:
+        "../scripts/misty/make_views.R"
