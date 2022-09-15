@@ -31,7 +31,7 @@ rule get_deconv_views:
     script:
         "../scripts/misty/make_views.R"
 
-rule run_func_views:
+rule run_views:
     input:
         view = 'data/working/ST/Misty/{tissue}/{sample}/{view_type}_view.rds'
     output: 
@@ -46,4 +46,4 @@ rule run_func_views:
         disk_mb=1000,
         time='12:00:00'
     script:
-        "../scripts/misty/make_views.R"
+        "../scripts/misty/run.R"
