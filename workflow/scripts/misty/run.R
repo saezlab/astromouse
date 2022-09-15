@@ -24,7 +24,7 @@ if(exists("snakemake")){
   #files for testing in Rstudio
   rs <- 42
   
-  view_fp <- snakemake@input$view
+  view_fp <- 'data/working/ST/Misty/brain/Sample_304_C1/functional_view.rds'
   cores <- 6
   output_dir <- "mistyTest"
 }
@@ -39,12 +39,18 @@ plan(multisession, workers = cores)
 cat("DEBUG: reading misty view from", view_fp, "\n")
 misty.views <- readRDS(view_fp)
 
+lapply(names(misty.views), function(view){
+  if(view != 'misty.uniqueid'){
+    colnames(misty.views[[view]]$data) <<- gsub("[[:punct:]]", "", colnames(misty.views[[view]]$data))
+  }
+  return()
+})
 
 
 # run misty ---------------------------------------------------------------
 
 cat("DEBUG: started running misty with seed", rs,"\noutput dir is:", output_dir, "\n")
-misty.views %>% run_misty(results.folder= output_dir, seed = rs, verbose = FALSE)
+misty.views %>% run_misty(results.folder = output_dir, seed = rs, verbose = FALSE)
 cat("INFO: finished building misty models; stored in", output_dir, "\n")
 
 
