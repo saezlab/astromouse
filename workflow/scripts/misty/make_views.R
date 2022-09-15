@@ -61,10 +61,10 @@ datas <- lapply(datas_fp, function(fp){
 
 # filter data for specified sample ----------------------------------------
 
-datas$coord <- datas$coord %>% filter(library_id == sample)
+datas[[1]] <- datas[[1]] %>% filter(library_id == sample)
 
 datas[2:length(datas)] <- lapply(datas[2:length(datas)], function(data){
-  data <- data[rownames(datas$coord),]
+  data <- data[rownames(datas[[1]]),]
 })
 
 if(nrow(datas[[1]]) < 1) stop('There are no spots for sample ', sample, ' in the provided coordinates file:\n', coord_fp)
@@ -73,11 +73,11 @@ if(nrow(datas[[1]]) < 1) stop('There are no spots for sample ', sample, ' in the
 # determine distance between spots ----------------------------------------
 # based on image coordinates instead of rows and columns
 
-centroid <- round(colMeans(datas$coord %>% select(array_col, array_row)))
-spots <- datas$coord %>% filter(array_col %in% (centroid[1]-18):(centroid[1]+18) &  array_row %in% (centroid[2]-18):(centroid[2]+18)) %>% 
+centroid <- round(colMeans(datas[[1]] %>% select(array_col, array_row)))
+spots <- datas[[1]] %>% filter(array_col %in% (centroid[1]-18):(centroid[1]+18) &  array_row %in% (centroid[2]-18):(centroid[2]+18)) %>% 
                                   select(x,y)
 
-if(nrow(datas[[1]]) < 30) spots <- datas$coord
+if(nrow(datas[[1]]) < 30) spots <- datas[[1]]
 
 #calculate the distance between selected spots
 dM <- dist(spots, diag = F, upper = F) %>% unique() %>% sort()
@@ -97,14 +97,14 @@ cat('Using', as.character(2*radius), 'as l parameter in paraview creation\n')
 if(view == 'activities'){
   intra.view <- create_initial_view(datas[[2]])
   
-  para.view <- create_initial_view(datas[[3]]) %>% add_paraview(datas$coord %>% select(x,y), l = radius * 2)
+  para.view <- create_initial_view(datas[[3]]) %>% add_paraview(datas[[1]] %>% select(x,y), l = radius * 2)
   para.view <- within(para.view, rm(misty.uniqueid, intraview))
   
   misty.views <- intra.view %>% add_views(new.views = para.view)
   
 }else if (view == 'cell_types'){
   
-  misty.views <- create_initial_view(datas[[2]]) %>% add_paraview(datas$coord %>% select(x,y), l = radius * 2)
+  misty.views <- create_initial_view(datas[[2]]) %>% add_paraview(datas[[1]] %>% select(x,y), l = radius * 2)
   
 }
 
