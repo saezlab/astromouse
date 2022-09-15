@@ -18,7 +18,7 @@ rule get_func_views:
     conda:
         "../envs/misty.yml"
     script:
-        "../scripts/misty/make_func_views.R"
+        "../scripts/misty/make_views.R"
 
 rule get_deconv_views:
     input:
@@ -29,4 +29,4 @@ rule get_deconv_views:
     conda:
         "../envs/misty.yml"
     script:
-        "../scripts/misty/make_CT_views.R"
+        "../scripts/misty/make_views.R"

@@ -10,10 +10,24 @@ library(distances)
 if(exists("snakemake")){
   tissue <- snakemake@wildcards[[1]]
   
-  coord_fp = normalizePath(snakemake@input$coords)
-  pathways_fp <- normalizePath(snakemake@input$pathways)
-  tf_fp <- normalizePath(snakemake@input$TFs)
+  datas_fp <- lappy(snakemake@input, normalizePath)
+  
+  if(length(datas_fp) == 3){
+    # names(datas_fp) <- c('coord', 'pathways', 'TFs')
+    
+    view <- 'activities'
+    
+  }else if(length(datas_fp) == 2){
+    # names(datas_fp) <- c('coord', 'CT')
+    
+    view <- 'cell_types'
+    
+  }else{
+    stop('The input has to contain either 2 or 3 files, corresponding (in order) to coordinates, and then either intra+para data (in 1 file), or intra and paraview (2 files). ', length(datas_fp), ' files were given:\n', paste(datas_fp, collapse = ' '))
+  }
+  
   sample <- basename(dirname(snakemake@output[[1]]))
+  
 }else{
   tissue <- 'heart'
   
@@ -21,13 +35,17 @@ if(exists("snakemake")){
   pathways_fp <- normalizePath(paste('data/working/ST/functional/', tissue, '_activities_pathways.csv', sep=""))
   tf_fp <- normalizePath(paste('data/working/ST/functional/', tissue, '_activities_TFs.csv', sep=""))
   sample <- "V19T26_014_A1_G8"
+  view <- 'activities'
+  
+  datas_fp <- list(coord = coord_fp, pathways = pathways_fp, TFs = tf_fp)
+  
 }
 
 
 
 # load data ---------------------------------------------------------------
 
-datas_fp <- list(coord = coord_fp, pathways = pathways_fp, TFs = tf_fp)
+
 
 datas <- lapply(datas_fp, function(fp){
   data <- read_csv(fp)
@@ -70,12 +88,20 @@ cat('Using', as.character(2*radius), 'as l parameter in paraview creation\n')
 
 # make views --------------------------------------------------------------
 
-path.view <- create_initial_view(datas$pathways)
+if(view == 'activities'){
+  intra.view <- create_initial_view(datas[[2]])
+  
+  para.view <- create_initial_view(datas[[3]]) %>% add_paraview(datas$coord %>% select(x,y), l = radius * 2)
+  para.view <- within(para.view, rm(misty.uniqueid, intraview))
+  
+  misty.views <- intra.view %>% add_views(new.views = para.view)
+  
+}else if (view == 'cell_types'){
+  
+  misty.views <- create_initial_view(datas[[2]]) %>% add_paraview(datas$coord %>% select(x,y), l = radius * 2)
+  
+}
 
-TF.view <- create_initial_view(datas$TFs) %>% add_paraview(datas$coord %>% select(x,y), l = radius * 2)
-TF.view <- within(TF.view, rm(misty.uniqueid, intraview))
-
-misty.views <- path.view %>% add_views(new.views = TF.view)
 
 if(exists("snakemake")){
   saveRDS(misty.views, snakemake@output[[1]])
