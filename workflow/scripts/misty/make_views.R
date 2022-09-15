@@ -12,6 +12,12 @@ if(exists("snakemake")){
   
   datas_fp <- lapply(snakemake@input, normalizePath)
   
+  cat(snakemake@input)
+  
+  cat('\n\n\n\n')
+  
+  cat(datas_fp, '\n\n\n')
+  
   if(length(datas_fp) == 3){
     # names(datas_fp) <- c('coord', 'pathways', 'TFs')
     

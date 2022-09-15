@@ -100,7 +100,7 @@ if tissue == 'brain':
 
 if tissue == 'heart':
     with PdfPages(output_fp) as output_pdf:
-        for library in acts.obs.filter(['library_id','mouse'], axis = 1).drop_duplicates().sort_values('library_id')['library_id'][:3]:
+        for library in acts.obs.filter(['library_id','mouse'], axis = 1).drop_duplicates().sort_values('library_id')['library_id']:
             #[os.path.basename(os.path.dirname(sample)) for sample in sample_paths]
             fig, axs = plt.subplots(4, 4, figsize=(23, 20))
             axs = axs.flatten()
