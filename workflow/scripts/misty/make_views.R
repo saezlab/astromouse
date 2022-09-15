@@ -74,7 +74,7 @@ if(nrow(datas[[1]]) < 1) stop('There are no spots for sample ', sample, ' in the
 # based on image coordinates instead of rows and columns
 
 centroid <- round(colMeans(datas[[1]] %>% select(array_col, array_row)))
-spots <- datas[[1]] %>% filter(array_col %in% (centroid[1]-18):(centroid[1]+18) &  array_row %in% (centroid[2]-18):(centroid[2]+18)) %>% 
+spots <- datas[[1]] #%>% filter(array_col %in% (centroid[1]-18):(centroid[1]+18) &  array_row %in% (centroid[2]-18):(centroid[2]+18)) %>% 
                                   select(x,y)
 
 if(nrow(datas[[1]]) < 30) spots <- datas[[1]]
