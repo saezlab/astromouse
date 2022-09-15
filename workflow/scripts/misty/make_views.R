@@ -10,7 +10,7 @@ library(distances)
 if(exists("snakemake")){
   tissue <- snakemake@wildcards[[1]]
   
-  datas_fp <- lappy(snakemake@input, normalizePath)
+  datas_fp <- lapply(snakemake@input, normalizePath)
   
   if(length(datas_fp) == 3){
     # names(datas_fp) <- c('coord', 'pathways', 'TFs')
