@@ -15,12 +15,12 @@ if(exists("snakemake")){
   tf_fp <- normalizePath(snakemake@input$TFs)
   sample <- basename(dirname(snakemake@output[[1]]))
 }else{
-  tissue <- 'brain'
+  tissue <- 'heart'
   
   coord_fp <- normalizePath(paste('data/working/ST/Misty/', tissue, '_coordinates.csv', sep=""))
   pathways_fp <- normalizePath(paste('data/working/ST/functional/', tissue, '_activities_pathways.csv', sep=""))
   tf_fp <- normalizePath(paste('data/working/ST/functional/', tissue, '_activities_TFs.csv', sep=""))
-  sample <- "Sample_158_A1"
+  sample <- "V19T26_014_A1_G8"
 }
 
 
@@ -43,7 +43,7 @@ datas[2:length(datas)] <- lapply(datas[2:length(datas)], function(data){
   data <- data[rownames(datas$coord),]
 })
 
-
+if(nrow(datas[[1]]) < 1) stop('There are no spots for sample ', sample, ' in the provided coordinates file:\n', coord_fp)
 
 
 # determine distance between spots ----------------------------------------
@@ -53,6 +53,8 @@ centroid <- round(colMeans(datas$coord %>% select(array_col, array_row)))
 spots <- datas$coord %>% filter(array_col %in% (centroid[1]-18):(centroid[1]+18) &  array_row %in% (centroid[2]-18):(centroid[2]+18)) %>% 
                                   select(x,y)
 
+if(nrow(datas[[1]]) < 30) spots <- datas$coord
+
 #calculate the distance between selected spots
 dM <- dist(spots, diag = F, upper = F) %>% unique() %>% sort()
 
@@ -60,7 +62,7 @@ dM <- dist(spots, diag = F, upper = F) %>% unique() %>% sort()
 d <- abs(dM[1:(length(dM)-1)] - dM[2:length(dM)])
 
 #average of shortest distances
-radius <- dM[1:which(d > 0. * dM[1])[1]] %>% mean() %>% round()
+radius <- dM[1:which(d > 0.1 * dM[1])[1]] %>% mean() %>% round()
 
 
 cat('The distance between spots is', as.character(radius), '\n')
