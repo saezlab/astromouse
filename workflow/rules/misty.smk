@@ -14,7 +14,7 @@ rule get_func_views:
         'data/working/ST/functional/{tissue}_activities_pathways.csv',
         'data/working/ST/functional/{tissue}_activities_TFs.csv'
     output:
-        view = 'data/working/ST/Misty/{sample}/{tissue}_functional_view.rds'
+        view = 'data/working/ST/Misty/{tissue}/{sample}/functional_view.rds'
     conda:
         "../envs/misty.yml"
     script:
@@ -25,7 +25,7 @@ rule get_deconv_views:
         'data/working/ST/Misty/brain_coordinates.csv',
         'data/working/ST/ST_brain_deconvoluted.csv'
     output:
-        view = 'data/working/ST/Misty/{sample}/brain_CT_view.rds'
+        view = 'data/working/ST/Misty/brain/{sample}/celltype_view.rds'
     conda:
         "../envs/misty.yml"
     script:

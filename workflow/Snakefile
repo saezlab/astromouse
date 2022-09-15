@@ -8,9 +8,9 @@ brain_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/
 heart_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/original/ST/visium_data_{0}/'.format('heart'), '*'))]
 rule all:
     input:
-        expand('data/working/ST/Misty/{sample}/brain_functional_view.rds', sample = brain_samples[0:1]),
-        expand('data/working/ST/Misty/{sample}/heart_functional_view.rds', sample = heart_samples[0:1]),
-        expand('data/working/ST/Misty/{sample}/brain_CT_view.rds', sample = brain_samples[0:1])
+        expand('data/working/ST/Misty/brain/{sample}/functional_view.rds', sample = brain_samples[0:1]),
+        expand('data/working/ST/Misty/heart/{sample}/functional_view.rds', sample = heart_samples[0:1]),
+        expand('data/working/ST/Misty/brain/{sample}/celltype_view.rds', sample = brain_samples[0:1])
 
 
 module general:
