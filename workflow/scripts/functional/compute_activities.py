@@ -30,16 +30,15 @@ adata = sc.read_h5ad(adata_fp)
 # %%
 if normalisation == 'log1p':
     print('INFO: using log1p normalised counts')
-    adata.layers['SCT'] = adata.X
-    adata.X = adata.layers['counts'].copy()
-    del adata.layers['counts']
-
     sc.pp.normalize_total(adata, inplace=True)
     sc.pp.log1p(adata)
 
 
 elif normalisation == 'SCT':
     print('INFO: using SCT normalised counts')
+    adata.layers['counts'] = adata.X
+    adata.X = adata.layers['SCT'].copy()
+    del adata.layers['SCT']
 
 # %%
 if network == 'pathways':

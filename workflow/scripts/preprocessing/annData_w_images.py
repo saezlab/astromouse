@@ -234,7 +234,7 @@ adata_spatial = adata_spatial[adata.obs.index, list(set(adata.var.index.values).
 adata_spatial.obs = adata_spatial.obs.merge(adata.obs, left_index=True, right_index=True)
 
 # Add transformed counts and embeddings
-adata_spatial.layers['SCT'] = adata.layers['SCT'].copy()
+adata_spatial.layers['SCT'] = adata.X.copy()
 for obsm in list(adata.obsm.keys()):
     adata_spatial.obsm[obsm] = adata.obsm[obsm].copy()
 adata_spatial
