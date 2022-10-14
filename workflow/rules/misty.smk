@@ -58,11 +58,6 @@ rule plot_misty_results:
         seed = config['misty'].get("random_seed", 42)
     conda:
         "../envs/misty.yml"
-    threads: 6
-    resources:
-        mem_mb=25000,
-        disk_mb=1000,
-        time='12:00:00'
     script:
         "../scripts/misty/test.R"
 
