@@ -12,3 +12,4 @@ dependencies:
   - r-rcpp
   - r-rlist
   - r-ranger
+  - r-factoextra

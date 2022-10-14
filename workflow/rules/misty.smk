@@ -1,8 +1,8 @@
 rule get_coords:
     input:
-        data = 'data/working/ST/{tissue}_wImages.h5ad'
+        data = 'results/ST/{tissue}_wImages.h5ad'
     output:
-        coords = 'data/working/ST/Misty/{tissue}_coordinates.csv'
+        coords = 'results/ST/Misty/{tissue}_coordinates.csv'
     conda:
         "../envs/astromouse.yml"
     script:
@@ -10,11 +10,11 @@ rule get_coords:
 
 rule get_func_views:
     input:
-        'data/working/ST/Misty/{tissue}_coordinates.csv',
-        'data/working/ST/functional/{tissue}_activities_pathways.csv',
-        'data/working/ST/functional/{tissue}_activities_TFs.csv'
+        'results/ST/Misty/{tissue}_coordinates.csv',
+        'results/ST/functional/{tissue}_activities_pathways.csv',
+        'results/ST/functional/{tissue}_activities_TFs.csv'
     output:
-        view = 'data/working/ST/Misty/{tissue}/{sample}/functional_view.rds'
+        view = 'results/ST/Misty/{tissue}/{sample}/functional_view.rds'
     conda:
         "../envs/misty.yml"
     script:
@@ -22,10 +22,10 @@ rule get_func_views:
 
 rule get_deconv_views:
     input:
-        'data/working/ST/Misty/brain_coordinates.csv',
-        'data/working/ST/ST_brain_deconvoluted.csv'
+        'results/ST/Misty/brain_coordinates.csv',
+        'results/ST/ST_brain_deconvoluted.csv'
     output:
-        view = 'data/working/ST/Misty/brain/{sample}/celltype_view.rds'
+        view = 'results/ST/Misty/brain/{sample}/celltype_view.rds'
     conda:
         "../envs/misty.yml"
     script:
@@ -33,9 +33,9 @@ rule get_deconv_views:
 
 rule run_views:
     input:
-        view = 'data/working/ST/Misty/{tissue}/{sample}/{view_type}_view.rds'
+        view = 'results/ST/Misty/{tissue}/{sample}/{view_type}_view.rds'
     output: 
-        directory('data/working/ST/Misty/{tissue}/{sample}/{view_type}_misty_model')
+        directory('results/ST/Misty/{tissue}/{sample}/{view_type}_misty_model')
     params:
         seed = config['misty'].get("random_seed", 42)
     conda:
@@ -47,3 +47,22 @@ rule run_views:
         time='12:00:00'
     script:
         "../scripts/misty/run.R"
+
+rule plot_misty_results:
+    input:
+        'data/original/ST/metadata_visium_brain.csv',
+        lambda w: expand('results/ST/Misty/{{tissue}}/{sample}/{{view_type}}_misty_model', sample = config['samples'][w.tissue])
+    output: 
+        'plots/Misty/{tissue}/{view_type}_misty.pdf'
+    params:
+        seed = config['misty'].get("random_seed", 42)
+    conda:
+        "../envs/misty.yml"
+    threads: 6
+    resources:
+        mem_mb=25000,
+        disk_mb=1000,
+        time='12:00:00'
+    script:
+        "../scripts/misty/test.R"
+

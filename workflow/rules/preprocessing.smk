@@ -3,7 +3,7 @@ from glob import glob
 #     input:
 #         data = 'data/original/ST/ST_{tissue}_annotated.rds'
 #     output:
-#         h5ad = 'data/working/ST/ST_{tissue}_annotated.h5ad'
+#         h5ad = 'results/ST/ST_{tissue}_annotated.h5ad'
 #     conda:
 #         "../envs/preprocessing.yml"
 #     script:
@@ -13,7 +13,7 @@ rule MO_seurat_to_h5ad:
     input:
         data = 'data/original/MO/MO_{tissue}_annotated.rds'
     output:
-        h5ad = directory('data/working/MO/{tissue}')
+        h5ad = directory('results/MO/{tissue}')
     resources:
         mem_mb=30000
     conda:
@@ -25,7 +25,7 @@ rule ST_seurat_to_h5ad:
     input:
         data = 'data/original/ST/ST_{tissue}_annotated.rds'
     output:
-        h5ad = directory('data/working/ST/{tissue}_annotated')
+        h5ad = directory('results/ST/{tissue}_annotated')
     resources:
         mem_mb=30000
     conda:
@@ -37,7 +37,7 @@ rule ST_extract_deconv:
     input:
         data = 'data/original/ST/ST_brain_deconvoluted.rds'
     output:
-        csv = 'data/working/ST/ST_brain_deconvoluted.csv'
+        csv = 'results/ST/ST_brain_deconvoluted.csv'
     params:
         assay = config['deconvolution'].get("assay", 'hvg2000')
     # resources:
@@ -51,7 +51,7 @@ rule MO_h5ad_to_h5mu:
     input:
         rules.MO_seurat_to_h5ad.output
     output:
-        muad = 'data/working/MO/{tissue}.h5mu'
+        muad = 'results/MO/{tissue}.h5mu'
     conda:
         "../envs/astromouse.yml"
     script:
@@ -61,7 +61,7 @@ rule ST_combine_to_h5ad:
     input:
         rules.ST_seurat_to_h5ad.output
     output:
-        muad = 'data/working/ST/{tissue}.h5ad'
+        muad = 'results/ST/{tissue}.h5ad'
     conda:
         "../envs/astromouse.yml"
     script:
@@ -78,10 +78,10 @@ def samples_from_tissue(wildcards):
 
 rule combine_visium:
     input:
-        'data/working/ST/{tissue}.h5ad',
+        'results/ST/{tissue}.h5ad',
         samples_from_tissue
     output:
-        'data/working/ST/{tissue}_wImages.h5ad'
+        'results/ST/{tissue}_wImages.h5ad'
     conda:
         "../envs/astromouse.yml"
     resources:

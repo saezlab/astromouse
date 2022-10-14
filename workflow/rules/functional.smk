@@ -1,6 +1,6 @@
 rule plot_pathways:
     input:
-        'data/working/ST/{tissue}_wImages.h5ad'
+        'results/ST/{tissue}_wImages.h5ad'
     output:
         'plots/functional/{tissue}_pathways.pdf'
     params:
@@ -15,9 +15,9 @@ rule plot_pathways:
 
 rule get_PDactivities:
     input:
-        data = 'data/working/ST/{tissue}_wImages.h5ad'
+        data = 'results/ST/{tissue}_wImages.h5ad'
     output:
-        act = 'data/working/ST/functional/{tissue}_activities_{network}.csv' #network being either 'pathways' or 'TFs'
+        act = 'results/ST/functional/{tissue}_activities_{network}.csv' #network being either 'pathways' or 'TFs'
     params:
         normalisation = config['functional'].get("normalisation", 'log1p'), #or SCT
         top_genes = config['functional'].get("pathways_top_gene", 300),
