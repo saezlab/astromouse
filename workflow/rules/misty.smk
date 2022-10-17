@@ -64,5 +64,5 @@ rule plot_misty_results:
     conda:
         "../envs/misty.yml"
     script:
-        "../scripts/misty/test.R"
+        "../scripts/misty/plot_model_results.R"
 
