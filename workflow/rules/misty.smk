@@ -55,7 +55,7 @@ rule run_views:
 
 rule plot_misty_results:
     input:
-        'data/original/ST/metadata_visium_brain.csv',
+        'data/original/ST/metadata_visium_{tissue}.csv',
         lambda w: expand('results/ST/Misty/{{tissue}}/{sample}/{{view_type}}_misty_model', sample = config['samples'][w.tissue])
     output: 
         'plots/Misty/{tissue}/{view_type}_misty_overall.pdf',
