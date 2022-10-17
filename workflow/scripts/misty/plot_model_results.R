@@ -70,7 +70,7 @@ imp.signature <- extract_signature(results, type = "importance", trim = 1)
 
 imp.signature.pca <- prcomp(imp.signature %>% select(-sample))
 
-if(view == 'functional'){
+if(view == 'functional' | view == 'pathwayCT'){
   intra_name <- 'intra_act'
   cleaning <- TRUE
   
