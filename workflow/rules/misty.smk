@@ -5,6 +5,8 @@ rule get_coords:
         coords = 'results/ST/Misty/{tissue}_coordinates.csv'
     conda:
         "../envs/astromouse.yml"
+    resources:
+        mem_mb=25000
     script:
         "../scripts/misty/extract_coordinates.py"
 
