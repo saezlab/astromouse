@@ -46,7 +46,7 @@ rule ST_combine_to_h5ad:
     input:
         rules.ST_seurat_to_h5ad.output
     output:
-        ad = 'results/ST/convert/{tissue}.h5ad'
+        ad = temp('results/ST/convert/{tissue}.h5ad')
     conda:
         "../envs/astromouse.yml"
     script:
