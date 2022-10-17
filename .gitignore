@@ -7,6 +7,7 @@ __pycache__/
 data/
 logs/
 plots/
+results/
 
 #Snakemake stuff
 .snakemake/

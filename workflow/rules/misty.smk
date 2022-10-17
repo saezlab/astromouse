@@ -60,9 +60,9 @@ rule plot_misty_results:
     output: 
         'plots/Misty/{tissue}/{view_type}_misty.pdf'
     params:
-        seed = config['misty'].get("random_seed", 42)
+        lambda w: config['misty'][w.view_type]['plots'][w.tissue]
     conda:
         "../envs/misty.yml"
     script:
-        "../scripts/misty/plot_model_results.R"
+        "../scripts/misty/test.R"
 

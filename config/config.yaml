@@ -30,5 +30,9 @@ misty:
     random_seed: 42
     functional:
         bypass_intra: True
+        plots:
+            brain: {'trim': 1, 'cutoff': 1}
     celltype:
         bypass_intra: False
+        plots:
+            brain: {'trim': 1, 'cutoff': 1}
