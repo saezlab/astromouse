@@ -110,7 +110,7 @@ results %>% plot_view_contributions(trim = 1)
 
 results %>% plot_interaction_heatmap(intra_name, trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
 
-results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = cutoff, clean = cleaning)
+results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
 
 
 fviz_pca_var(imp.signature.pca,

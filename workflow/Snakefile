@@ -9,8 +9,8 @@ from glob import glob
 rule all:
     input:
         expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
-        expand('plots/Misty/brain/celltype_misty.pdf'),
-        expand('plots/Misty/{tissue}/functional_misty.pdf', tissue = ['brain', 'heart'])
+        expand('plots/Misty/brain/celltype_misty_overall.pdf'),
+        expand('plots/Misty/{tissue}/functional_misty_overall.pdf', tissue = ['brain', 'heart'])
 
 
 module general:
