@@ -24,7 +24,7 @@ print(sctcc)
 #storing count data in X matrix
 rna = rna[sct.obs.index, sct.var.index]
 sct.X = rna.X #sort and subset features according to sct assay
-sct.layers['SCT_CC'] = sctcc.X['SCT_CC']
+sct.layers['SCT_CC'] = sctcc.X
 
 for obsm in list(sctcc.obsm.keys()):
     sct.obsm[obsm] = sctcc.obsm[obsm]
