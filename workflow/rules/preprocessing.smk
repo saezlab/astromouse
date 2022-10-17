@@ -1,3 +1,4 @@
+from glob import glob
 
 # extract individual MO assays from a seurat object
 rule MO_seurat_to_h5ad:
