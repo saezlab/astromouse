@@ -21,7 +21,7 @@ if(exists("snakemake")){
   if(length(datas_fp) == 3){
     # names(datas_fp) <- c('coord', 'pathways', 'TFs')
     
-    view <- 'activities'
+    view <- 'functional'
     
   }else if(length(datas_fp) == 2){
     # names(datas_fp) <- c('coord', 'CT')
@@ -93,11 +93,12 @@ cat('Using', as.character(2*radius), 'as l parameter in paraview creation\n')
 
 # make views --------------------------------------------------------------
 
-if(view == 'activities'){
+if(view == 'functional'){
   intra.view <- create_initial_view(datas[[2]])
   
   para.view <- create_initial_view(datas[[3]]) %>% add_paraview(datas[[1]] %>% select(x,y), l = radius * 2)
-  para.view <- within(para.view, rm(misty.uniqueid, intraview))
+  para.view <- para.view %>% rename_view(., old.name = 'intraview', new.name = 'intra_act')
+  para.view <- within(para.view, rm(misty.uniqueid))
   
   misty.views <- intra.view %>% add_views(new.views = para.view)
   

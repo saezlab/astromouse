@@ -13,6 +13,8 @@ rule get_func_views:
         'results/ST/Misty/{tissue}_coordinates.csv',
         'results/ST/functional/{tissue}_activities_pathways.csv',
         'results/ST/functional/{tissue}_activities_TFs.csv'
+    params:
+        skip = 'intra'
     output:
         view = 'results/ST/Misty/{tissue}/{sample}/functional_view.rds'
     conda:
@@ -37,7 +39,8 @@ rule run_views:
     output: 
         directory('results/ST/Misty/{tissue}/{sample}/{view_type}_misty_model')
     params:
-        seed = config['misty'].get("random_seed", 42)
+        seed = config['misty'].get("random_seed", 42),
+        bypass_intra = lambda wildcards: config['misty'][wildcards.view_type].get('bypass_intra', False)
     conda:
         "../envs/misty.yml"
     threads: 6
@@ -46,7 +49,7 @@ rule run_views:
         disk_mb=1000,
         time='12:00:00'
     script:
-        "../scripts/misty/run.R"
+        "../scripts/misty/test.R"
 
 rule plot_misty_results:
     input:

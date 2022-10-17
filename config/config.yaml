@@ -28,3 +28,7 @@ functional:
 
 misty:
     random_seed: 42
+    functional:
+        bypass_intra: True
+    celltype:
+        bypass_intra: False
