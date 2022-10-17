@@ -41,7 +41,7 @@ rule get_patwayCT_views:
         'results/ST/functional/{tissue}_activities_pathways.csv',
         'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
-        view = 'results/ST/Misty/{tissue}/{sample}/pathwayCT_view.rds'
+        view = 'results/ST/Misty/{tissue}/{sample}/pathwaysCT_view.rds'
     conda:
         "../envs/misty.yml"
     script:
