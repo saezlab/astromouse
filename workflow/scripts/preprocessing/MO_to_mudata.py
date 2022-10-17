@@ -22,7 +22,8 @@ del sctcc.layers['logcounts']
 print(sctcc)
 
 #storing count data in X matrix
-sct.X = rna.X[sct.obs.index, sct.var.index] #sort and subset features according to sct assay
+rna = rna[sct.obs.index, sct.var.index]
+sct.X = rna.X #sort and subset features according to sct assay
 sct.layers['SCT_CC'] = sctcc.layers['SCT_CC']
 
 for obsm in list(sctcc.obsm.keys()):
