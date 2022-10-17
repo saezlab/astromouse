@@ -11,7 +11,8 @@ rule all:
         expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
         expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
         expand('plots/Misty/brain/{view_type}_misty_overall.pdf', view_type = ['pathwaysCT', 'celltype']),
-        expand('plots/Misty/{tissue}/functional_misty_overall.pdf', tissue = ['brain', 'heart'])
+        expand('plots/Misty/{tissue}/functional_misty_overall.pdf', tissue = ['brain']),
+        expand('plots/functional/{tissue}_pathways.pdf', tissue = ['brain', 'heart'])
 
 
 module general:
