@@ -11,23 +11,33 @@ cat("DEBUG: defining inputs, outputs, and script parameters\n")
 
 if(exists("snakemake")){
   
-  tissue <- print(snakemake@wildcards$tissue)
+  tissue <- snakemake@wildcards$tissue
+  view <- snakemake@wildcards$view_type
+  
+  plot_params <- snakemake@params[[1]]
   
   metadata_fp <- snakemake@input[[1]]
   result_folders <- unlist(snakemake@input[2:length(snakemake@input)])
   
 }else{
-  tissue <- 'brain'
+  tissue <- 'heart'
+  view <- 'functional'
+  
+  plot_params <- list(trim = 1, cutoff = 1)
+  
+  samples <- list.files(paste('data/original/ST/visium_data', tissue, sep = '_')) %>% sort()
+  
+  result_folders <- paste0(paste('results/ST/Misty', tissue, sep = .Platform$file.sep), '/', samples, '/', view, '_misty_model')
   
   #files for testing in Rstudio
-  metadata_fp <- 'data/original/ST/metadata_visium_brain.csv'
-  result_folders <- c("data/working/ST/Misty/brain/Sample_158_A1/celltype_misty_model", "data/working/ST/Misty/brain/Sample_158_C1/celltype_misty_model", "data/working/ST/Misty/brain/Sample_304_A1/celltype_misty_model", "data/working/ST/Misty/brain/Sample_304_C1/celltype_misty_model")
+  metadata_fp <- paste('data/original/ST/metadata_visium_', tissue,'.csv', sep = '')
   
 }
 
 
 # load data ---------------------------------------------------------------
 
+result_folders <-  result_folders %>% sort()
 samples <- result_folders %>% dirname() %>% basename()
 
 metadata <- read.csv(metadata_fp)
@@ -44,9 +54,11 @@ if(tissue == 'brain'){
   
   metadata$condition <- as.factor(metadata$condition)
   levels(metadata$condition) <- c('Flight', 'Control')
+  
+  metadata$sample <- gsub('-', '_', metadata$sample)
 }
 
-results <- lapply(result_folders %>% sort() %>% collect_results(), function(x){
+results <- lapply(result_folders %>% collect_results(), function(x){
   if('view' %in% colnames(x)){
     x$view <- gsub('[[:digit:]]+', '', x$view)
     x$view <- gsub('\\.$', '', x$view)
@@ -58,7 +70,15 @@ imp.signature <- extract_signature(results, type = "importance", trim = 1)
 
 imp.signature.pca <- prcomp(imp.signature %>% select(-sample))
 
-
+if(view == 'functional'){
+  intra_name <- 'intra_act'
+  cleaning <- TRUE
+  
+}else if (view == 'celltype'){
+  intra_name <- 'intra'
+  cleaning <- FALSE
+    
+}
 
 # plots -------------------------------------------------------------------
 
@@ -88,9 +108,9 @@ results %>% plot_improvement_stats("intra.R2")
 
 results %>% plot_view_contributions(trim = 1)
 
-results %>% plot_interaction_heatmap('intra', trim = 1)
+results %>% plot_interaction_heatmap(intra_name, trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
 
-results %>% plot_interaction_heatmap('para', trim = 1)
+results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = cutoff, clean = cleaning)
 
 
 fviz_pca_var(imp.signature.pca,
@@ -104,10 +124,33 @@ if(exists("snakemake")) dev.off()
 # by condition plots ------------------------------------------------------
 
 
-lapply(levels(metadata$condition)[1], function(group){
+lapply(levels(metadata$condition), function(group){
+  
+  if(exists("snakemake")){
+    if(group == 'Flight') pdf(snakemake@output[[2]])
+    if(group == 'Control') pdf(snakemake@output[[3]])
+  }
   
   group.samples <- metadata %>% filter(condition == group)
-  which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
+  keep <- which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
+  
+  group_folders <- result_folders[keep]
+  
+  results <- group_folders %>% collect_results()
+  
+  results %>% plot_improvement_stats()
+  
+  results %>% plot_improvement_stats("intra.R2")
+  
+  results %>% plot_view_contributions(trim = 1)
+  
+  results %>% plot_interaction_heatmap(intra_name, trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
+  
+  results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
+  
+  if(exists("snakemake")) dev.off()
+  
+  return()
   
 })
 
