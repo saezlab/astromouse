@@ -13,7 +13,7 @@ rule get_coords:
 rule get_func_views:
     input:
         'results/ST/Misty/{tissue}_coordinates.csv',
-        'results/ST/functional/{tissue}_activities_TFs.csv'
+        'results/ST/functional/{tissue}_activities_TFs.csv',
         'results/ST/functional/{tissue}_activities_pathways.csv'
     params:
         skip = 'intra'
