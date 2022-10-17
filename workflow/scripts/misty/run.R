@@ -17,12 +17,16 @@ if(exists("snakemake")){
   #files and parameters input by snakemake
   rs <- snakemake@params$seed
   
+  bypass_intra <- snakemake@params$bypass_intra
+  
   view_fp <- snakemake@input$view
   cores <- snakemake@threads[[1]]
   output_dir <- snakemake@output[[1]]
 }else{
   #files for testing in Rstudio
   rs <- 42
+  
+  bypass_intra <- FALSE
   
   view_fp <- 'data/working/ST/Misty/brain/Sample_304_C1/functional_view.rds'
   cores <- 6
@@ -50,7 +54,7 @@ lapply(names(misty.views), function(view){
 # run misty ---------------------------------------------------------------
 
 cat("DEBUG: started running misty with seed", rs,"\noutput dir is:", output_dir, "\n")
-misty.views %>% run_misty(results.folder = output_dir, seed = rs, verbose = FALSE)
+misty.views %>% run_misty(results.folder = output_dir, seed = rs, bypass.intra = bypass_intra, verbose = FALSE)
 cat("INFO: finished building misty models; stored in", output_dir, "\n")
 
 

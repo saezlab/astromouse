@@ -51,7 +51,7 @@ rule run_views:
         disk_mb=1000,
         time='12:00:00'
     script:
-        "../scripts/misty/test.R"
+        "../scripts/misty/run.R"
 
 rule plot_misty_results:
     input:
