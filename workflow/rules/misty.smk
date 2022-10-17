@@ -13,8 +13,8 @@ rule get_coords:
 rule get_func_views:
     input:
         'results/ST/Misty/{tissue}_coordinates.csv',
-        'results/ST/functional/{tissue}_activities_pathways.csv',
         'results/ST/functional/{tissue}_activities_TFs.csv'
+        'results/ST/functional/{tissue}_activities_pathways.csv'
     params:
         skip = 'intra'
     output:
@@ -24,12 +24,24 @@ rule get_func_views:
     script:
         "../scripts/misty/make_views.R"
 
-rule get_deconv_views:
+rule get_celltype_views:
     input:
-        'results/ST/Misty/brain_coordinates.csv',
-        'results/ST/ST_brain_deconvoluted.csv'
+        'results/ST/Misty/{tissue}_coordinates.csv',
+        'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
-        view = 'results/ST/Misty/brain/{sample}/celltype_view.rds'
+        view = 'results/ST/Misty/{tissue}/{sample}/celltype_view.rds'
+    conda:
+        "../envs/misty.yml"
+    script:
+        "../scripts/misty/make_views.R"
+
+rule get_patwayCT_views:
+    input:
+        'results/ST/Misty/{tissue}_coordinates.csv',
+        'results/ST/functional/{tissue}_activities_pathways.csv',
+        'results/ST/ST_{tissue}_deconvoluted.csv'
+    output:
+        view = 'results/ST/Misty/brain/{sample}/pathwayCT_view.rds'
     conda:
         "../envs/misty.yml"
     script:

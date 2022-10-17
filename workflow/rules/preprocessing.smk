@@ -1,14 +1,5 @@
-from glob import glob
-# rule ST_seurat_to_h5ad:
-#     input:
-#         data = 'data/original/ST/ST_{tissue}_annotated.rds'
-#     output:
-#         h5ad = 'results/ST/ST_{tissue}_annotated.h5ad'
-#     conda:
-#         "../envs/preprocessing.yml"
-#     script:
-#         "../scripts/preprocessing/RDS_to_h5ad.R"
 
+# extract individual MO assays from a seurat object
 rule MO_seurat_to_h5ad:
     input:
         data = 'data/original/MO/MO_{tissue}_annotated.rds'
@@ -21,6 +12,21 @@ rule MO_seurat_to_h5ad:
     script:
         "../scripts/preprocessing/RDS_to_h5ad.R"
 
+# creates a mudata object with three assays: rna, atac and chromvar
+# rna has counts in .X, and SCT / SCT_CC normalised data in respective layers
+# atac has only counts
+# chromvar also
+rule MO_h5ad_to_h5mu:
+    input:
+        rules.MO_seurat_to_h5ad.output
+    output:
+        muad = 'results/MO/{tissue}.h5mu'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        "../scripts/preprocessing/MO_to_mudata.py"
+
+# extract ST assays from seurat object
 rule ST_seurat_to_h5ad:
     input:
         data = 'data/original/ST/ST_{tissue}_annotated.rds'
@@ -34,6 +40,7 @@ rule ST_seurat_to_h5ad:
     script:
         "../scripts/preprocessing/RDS_to_h5ad.R"
 
+# extract stereoscope deconvolution from Seurat to .csv
 rule ST_extract_deconv:
     input:
         data = 'data/original/ST/ST_brain_deconvoluted.rds'
@@ -48,16 +55,7 @@ rule ST_extract_deconv:
     script:
         "../scripts/preprocessing/RDS_to_h5ad.R"
 
-rule MO_h5ad_to_h5mu:
-    input:
-        rules.MO_seurat_to_h5ad.output
-    output:
-        muad = 'results/MO/{tissue}.h5mu'
-    conda:
-        "../envs/astromouse.yml"
-    script:
-        "../scripts/preprocessing/MO_to_mudata.py"
-
+# combine assays (previously in Seurat objects) into Anndata
 rule ST_combine_to_h5ad:
     input:
         rules.ST_seurat_to_h5ad.output
@@ -77,6 +75,7 @@ def samples_from_tissue(wildcards):
     sample_paths = [os.path.join(folder, 'filtered_feature_bc_matrix.h5') for folder in folders]
     return sample_paths
 
+# add images and unfiltered counts to ST data in Anndata format
 rule combine_visium:
     input:
         'results/ST/{tissue}.h5ad',
