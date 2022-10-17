@@ -34,7 +34,7 @@ rule ST_seurat_to_h5ad:
     output:
         h5ad = temp(directory('results/ST/convert/{tissue}_annotated'))
     resources:
-        mem_mb=35000,
+        mem_mb=50000,
         disk_mb=20000
     conda:
         "../envs/preprocessing.yml"
