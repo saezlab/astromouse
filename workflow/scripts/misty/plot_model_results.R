@@ -14,14 +14,14 @@ if(exists("snakemake")){
   tissue <- print(snakemake@wildcards$tissue)
   
   metadata_fp <- snakemake@input[[1]]
-  result_folders <- unlist(snakemake@input)
+  result_folders <- unlist(snakemake@input[2:length(snakemake@input)])
   
 }else{
   tissue <- 'brain'
   
   #files for testing in Rstudio
   metadata_fp <- 'data/original/ST/metadata_visium_brain.csv'
-  result_folders <- c("data/working/ST/Misty/brain/Sample_159_B1/celltype_misty_model", "data/working/ST/Misty/brain/Sample_159_A1/celltype_misty_model")
+  result_folders <- c("data/working/ST/Misty/brain/Sample_158_A1/celltype_misty_model", "data/working/ST/Misty/brain/Sample_158_C1/celltype_misty_model", "data/working/ST/Misty/brain/Sample_304_A1/celltype_misty_model", "data/working/ST/Misty/brain/Sample_304_C1/celltype_misty_model")
   
 }
 
@@ -58,6 +58,9 @@ imp.signature <- extract_signature(results, type = "importance", trim = 1)
 
 imp.signature.pca <- prcomp(imp.signature %>% select(-sample))
 
+
+
+# plots -------------------------------------------------------------------
 
 if(exists("snakemake")) pdf(snakemake@output[[1]])
 ggplot(
@@ -98,8 +101,15 @@ fviz_pca_var(imp.signature.pca,
 if(exists("snakemake")) dev.off()
 
 
+# by condition plots ------------------------------------------------------
 
 
+lapply(levels(metadata$condition)[1], function(group){
+  
+  group.samples <- metadata %>% filter(condition == group)
+  which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
+  
+})
 
 
 
