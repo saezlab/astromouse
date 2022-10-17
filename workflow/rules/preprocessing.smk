@@ -40,6 +40,17 @@ rule ST_seurat_to_h5ad:
     script:
         "../scripts/preprocessing/RDS_to_h5ad.R"
 
+# combine assays (previously in Seurat objects) into Anndata
+rule ST_combine_to_h5ad:
+    input:
+        rules.ST_seurat_to_h5ad.output
+    output:
+        ad = 'results/ST/convert/{tissue}.h5ad'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        "../scripts/preprocessing/ST_to_adata.py"
+
 # extract stereoscope deconvolution from Seurat to .csv
 rule ST_extract_deconv:
     input:
@@ -55,16 +66,6 @@ rule ST_extract_deconv:
     script:
         "../scripts/preprocessing/RDS_to_h5ad.R"
 
-# combine assays (previously in Seurat objects) into Anndata
-rule ST_combine_to_h5ad:
-    input:
-        rules.ST_seurat_to_h5ad.output
-    output:
-        muad = 'results/ST/{tissue}.h5ad'
-    conda:
-        "../envs/astromouse.yml"
-    script:
-        "../scripts/preprocessing/ST_to_adata.py"
 
 # Combines the ST data into one AnnData object
 # the .raw contains the original count data -> WITHOUT ANY FILTERING of spots or genes
@@ -78,7 +79,7 @@ def samples_from_tissue(wildcards):
 # add images and unfiltered counts to ST data in Anndata format
 rule combine_visium:
     input:
-        'results/ST/{tissue}.h5ad',
+        'results/ST/convert/{tissue}.h5ad',
         samples_from_tissue
     output:
         'results/ST/{tissue}_wImages.h5ad'
