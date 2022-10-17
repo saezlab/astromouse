@@ -8,7 +8,7 @@ from glob import glob
 # heart_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/original/ST/visium_data_{0}/'.format('heart'), '*'))]
 rule all:
     input:
-        expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart'])
+        expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
         expand('plots/Misty/brain/celltype_misty.pdf'),
         expand('plots/Misty/{tissue}/functional_misty.pdf', tissue = ['brain', 'heart'])
 
