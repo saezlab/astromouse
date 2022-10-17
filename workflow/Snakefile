@@ -4,13 +4,13 @@ min_version("6.0")
 configfile: "config/config.yaml"
 
 from glob import glob
-brain_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/original/ST/visium_data_{0}/'.format('brain'), '*'))]
-heart_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/original/ST/visium_data_{0}/'.format('heart'), '*'))]
+# brain_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/original/ST/visium_data_{0}/'.format('brain'), '*'))]
+# heart_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/original/ST/visium_data_{0}/'.format('heart'), '*'))]
 rule all:
     input:
-        expand('results/ST/Misty/brain/{sample}/{view_type}_misty_model', sample = brain_samples, view_type = ['functional','celltype']),
-        expand('results/ST/Misty/heart/{sample}/functional_misty_model', sample = heart_samples),
-        expand('plots/Misty/brain/celltype_misty.pdf')
+        expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart'])
+        expand('plots/Misty/brain/celltype_misty.pdf'),
+        expand('plots/Misty/{tissue}/functional_misty.pdf', tissue = ['brain', 'heart'])
 
 
 module general:
