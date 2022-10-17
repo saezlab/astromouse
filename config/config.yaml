@@ -33,7 +33,7 @@ misty:
         plots:
             brain: {'trim': 2, 'cutoff': 1.5}
             heart: {'trim': 2, 'cutoff': 1.5}
-    functional:
+    pathwaysCT:
         bypass_intra: True
         plots:
             brain: {'trim': 2, 'cutoff': 1.5}
