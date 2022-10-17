@@ -108,6 +108,10 @@ if(view == 'functional'){
   
 }
 
+para.name <- names(misty.views)[grepl('para', names(misty.views))]
+
+misty.views <- misty.views %>% rename_view(., old.name = para.name, new.name = 'paraview', new.abbrev = 'para')
+
 
 if(exists("snakemake")){
   saveRDS(misty.views, snakemake@output[[1]])
