@@ -53,7 +53,7 @@ lapply(names(misty.views), function(view){
 
 # run misty ---------------------------------------------------------------
 
-cat("DEBUG: started running misty with seed", rs,"\noutput dir is:", output_dir, "\n")
+cat("DEBUG: started running misty with seed", rs,"\nbypass.intra set to:", bypass_intra, "\noutput dir is:", output_dir, "\n")
 misty.views %>% run_misty(results.folder = output_dir, seed = rs, bypass.intra = bypass_intra, verbose = FALSE)
 cat("INFO: finished building misty models; stored in", output_dir, "\n")
 
