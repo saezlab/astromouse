@@ -31,7 +31,7 @@ rule ST_seurat_to_h5ad:
     input:
         data = 'data/original/ST/ST_{tissue}_annotated.rds'
     output:
-        h5ad = directory('results/ST/{tissue}_annotated')
+        h5ad = temp(directory('results/ST/convert/{tissue}_annotated'))
     resources:
         mem_mb=30000,
         disk_mb=20000
