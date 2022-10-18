@@ -70,9 +70,9 @@ rule plot_misty_results:
         'data/original/ST/metadata_visium_{tissue}.csv',
         lambda w: expand('results/ST/Misty/{{tissue}}/{sample}/{{view_type}}_misty_model', sample = config['samples'][w.tissue])
     output: 
-        'plots/Misty/{tissue}/{view_type}_misty_overall.pdf',
-        'plots/Misty/{tissue}/{view_type}_misty_Flight.pdf',
-        'plots/Misty/{tissue}/{view_type}_misty_Control.pdf'
+        'plots/Misty/{tissue}/{view_type}_misty.pdf'
+        # 'plots/Misty/{tissue}/{view_type}_misty_Flight.pdf',
+        # 'plots/Misty/{tissue}/{view_type}_misty_Control.pdf'
 
     params:
         lambda w: config['misty'][w.view_type]['plots'][w.tissue]
