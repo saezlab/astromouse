@@ -9,6 +9,7 @@ dependencies:
   - pip
   - ipykernel
   - ipywidgets
+  - r-xml
   - r-monocle3
   - r-remotes
   - bioconductor-rhdf5
