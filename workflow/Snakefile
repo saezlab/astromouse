@@ -8,11 +8,15 @@ from glob import glob
 # heart_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/original/ST/visium_data_{0}/'.format('heart'), '*'))]
 rule all:
     input:
-        expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
-        expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
+        # expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
+        # expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
+        expand('plots/functional/{tissue}_pathways.pdf', tissue = ['brain']),
         expand('plots/Misty/brain/{view_type}_misty.pdf', view_type = ['pathwaysCT', 'celltype']),
-        expand('plots/Misty/{tissue}/functional_misty.pdf', tissue = ['brain']),
-        expand('plots/functional/{tissue}_pathways.pdf', tissue = ['brain'])
+        expand('results/Misty/brain/{view_type}_importances.csv', view_type = ['pathwaysCT', 'celltype']),
+        expand('results/Misty/{tissue}/functional_importances.csv', tissue = ['brain', 'heart'])
+        # expand('plots/Misty/{tissue}/functional_misty.pdf', tissue = ['brain']),
+        
+
 
 
 module general:
@@ -25,7 +29,7 @@ module celloracle:
     snakefile: "rules/celloracle.smk"
     config: config
 
-use rule * from celloracle
+use rule * from celloracle as CO_*
 
 module preprocessing:
     snakefile: "rules/preprocessing.smk"
