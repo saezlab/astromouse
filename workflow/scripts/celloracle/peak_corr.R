@@ -23,7 +23,7 @@ peaks <- indata$mod$atac$var$`_index`
 h5closeAll()
 
 # Build sparse matrix and binarize
-indata <- Matrix::sparseMatrix(i=indices, p=indptr, x=data, index1 = FALSE)
+indata <- t(Matrix::sparseMatrix(i=indices, p=indptr, x=data, index1 = FALSE))
 indata@x[indata@x > 0] <- 1
 
 # Format cell info
