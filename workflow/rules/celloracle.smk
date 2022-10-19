@@ -11,6 +11,9 @@ rule peak_corr:
         organism=config['organism'],
         min_count=config['celloracle']['min_count'],
         max_count=config['celloracle']['max_count']
+    threads: 32
+    resources:
+        mem_mb=48000
     envmodules:
         "lib/openssl"
     shell:
