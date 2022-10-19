@@ -74,6 +74,8 @@ rule build_grn:
         "../envs/celloracle.yml"
     output:
         "results/MO/celloracle/{tissue}/grn.celloracle.links"
+    resources:
+        mem_mb=48000
     shell:
         "python workflow/scripts/celloracle/build_grn.py -m {input.mdata} -b {input.base_grn} -l {output}"
 
@@ -88,6 +90,8 @@ rule filter_grn:
         path_out='results/MO/celloracle/{tissue}/',
     output:
         "logs/filter_grn/{tissue}/log.out"
+    resources:
+        mem_mb=48000
     shell:
         """
         python workflow/scripts/celloracle/filter_grn.py -l {input} -p {params.thr_edge_pval} -t {params.thr_top_edges} -o {params.path_out}
