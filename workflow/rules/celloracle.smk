@@ -32,6 +32,8 @@ rule tss_annotation:
     params:
         organism=config['organism'],
         thr_coaccess=config['celloracle']['thr_coaccess']
+    resources:
+        mem_mb=48000
     shell:
          "python workflow/scripts/celloracle/tss_annotation.py -a {input.all_peaks} -c {input.connections} -o {params.organism} -t {params.thr_coaccess} -p {output}"
 
@@ -43,7 +45,7 @@ rule tf_motif_scan:
     output:
         "results/MO/celloracle/{tissue}/motifs.celloracle.tfinfo"
     resources:
-        mem_mb=32000
+        mem_mb=48000
     params:
         organism=config['organism'],
         fpr=config['celloracle']['fpr']
@@ -59,6 +61,8 @@ rule build_base_grn:
         thr_motif_score=config['celloracle']['thr_motif_score']
     output:
         "results/MO/celloracle/{tissue}/base_GRN_dataframe.csv"
+    resources:
+        mem_mb=48000
     shell:
         "python workflow/scripts/celloracle/build_base_grn.py -i {input} -t {params.thr_motif_score} -g {output}"
 
