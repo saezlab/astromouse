@@ -5,14 +5,16 @@ neurips2021:
     trajectories:
         blood:
             celltypes: 'HSC;MKE_prog;Proerythroblast;Erythroblast;Normoblast'
-            celloracle:
-                min_count: 2000
-                max_count: 15000
-                thr_coaccess: 0.8
-                fpr: 0.02
-                thr_motif_score: 10
-                thr_edge_pval: 0.001
-                thr_top_edges: 2000
+
+organism: "human"
+celloracle:
+    min_count: 2000
+    max_count: 15000
+    thr_coaccess: 0.8
+    fpr: 0.02
+    thr_motif_score: 10
+    thr_edge_pval: 0.001
+    thr_top_edges: 2000
 
 samples:
     brain: ['Sample_159_B1', 'Sample_159_A1', 'Sample_158_A1', 'Sample_158_B1', 'Sample_304_B1', 'Sample_304_A1', 'Sample_159_D1', 'Sample_158_D1', 'Sample_304_C1', 'Sample_158_C1', 'Sample_304_D1', 'Sample_159_C1']

@@ -1,17 +1,16 @@
 rule peak_corr:
     input:
-        data="resources/{dataset}/{trajectory}/mdata.h5mu",
-        log="logs/add_r_env/celloracle.out"
+        data="results/MO/{dataset}.h5mu"
     conda:
         "../envs/celloracle.yml"
     output:
-        path_all_peaks="resources/{dataset}/{trajectory}/celloracle/all_peaks.csv",
-        path_connections="resources/{dataset}/{trajectory}/celloracle/cicero_connections.csv",
-        path_plot="results/{dataset}/{trajectory}/celloracle/peak_thr.pdf"
+        path_all_peaks="results/MO/celloracle/{dataset}/all_peaks.csv",
+        path_connections="results/MO/celloracle/{dataset}/cicero_connections.csv",
+        path_plot="results/MO/celloracle/{dataset}/peak_thr.pdf"
     params:
-        organism=lambda w: config[w.dataset]['organism'],
-        min_count=lambda w: config[w.dataset]['trajectories'][w.trajectory]['celloracle']['min_count'],
-        max_count=lambda w: config[w.dataset]['trajectories'][w.trajectory]['celloracle']['max_count']
+        organism=config['organism'],
+        min_count=lambda w: config['celloracle']['min_count'],
+        max_count=lambda w: config['celloracle']['max_count']
     envmodules:
         "lib/openssl"
     shell:

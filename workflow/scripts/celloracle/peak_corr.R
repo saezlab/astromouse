@@ -15,9 +15,9 @@ path_connections <- args[12]
 
 # Process mudata
 indata <- H5Fopen(path_data)
-indices <- indata$mod$atac$layers$counts$indices
-indptr <- indata$mod$atac$layers$counts$indptr
-data <- as.numeric(indata$mod$atac$layers$counts$data)
+indices <- indata$mod$atac$X$indices
+indptr <- indata$mod$atac$X$indptr
+data <- as.numeric(indata$mod$atac$X$data)
 barcodes <- indata$mod$atac$obs$`_index`
 peaks <- indata$mod$atac$var$`_index`
 h5closeAll()
