@@ -54,8 +54,7 @@ abline(v = c(min_count, max_count), col='red', lwd=3, lty=2)
 dev.off()
 
 # Filter by peak_count
-input_cds <- input_cds[,peaks_per_cell >= min_count] 
-input_cds <- input_cds[,peaks_per_cell <= max_count]
+input_cds <- input_cds[,(peaks_per_cell >= min_count) & (peaks_per_cell <= max_count)]
 
 # Data preprocessing
 set.seed(2017)
