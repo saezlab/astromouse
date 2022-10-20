@@ -12,12 +12,9 @@ rule all:
         # expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
         expand('plots/functional/{tissue}_pathways.pdf', tissue = ['brain']),
         expand('plots/Misty/brain/{view_type}_misty.pdf', view_type = ['pathwaysCT', 'celltype']),
-        expand('results/Misty/brain/{view_type}_importances.csv', view_type = ['pathwaysCT', 'celltype']),
-        expand('results/Misty/{tissue}/functional_importances.csv', tissue = ['brain', 'heart']),
         expand('plots/Misty/brain/{view_type}_diffplots.pdf', view_type = ['pathwaysCT', 'celltype']),
-        expand('plots/Misty/{tissue}/functional_diffplots.pdf', tissue = ['brain'])
-
-        # expand('plots/Misty/{tissue}/functional_misty.pdf', tissue = ['brain']),
+        expand('plots/Misty/{tissue}/functional_diffplots.pdf', tissue = ['brain', 'heart']),
+        expand('plots/Misty/{tissue}/functional_misty.pdf', tissue = ['brain', 'heart'])
         
 
 
