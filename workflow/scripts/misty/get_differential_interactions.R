@@ -2,7 +2,8 @@ library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(mistyR)
-library(factoextra)
+
+# helpers -----------------------------------------------------------------
 
 
 extract_contrast_interactions <- function (misty.results.from, misty.results.to, 
@@ -109,25 +110,26 @@ reformat_samples <- function(misty.results){
   return(results)
 }
 
-# define input and outputs ------------------------------------------------
+
+
+# set input and output paths ----------------------------------------------
 
 cat("DEBUG: defining inputs, outputs, and script parameters\n")
 
 if(exists("snakemake")){
   
   tissue <- snakemake@wildcards$tissue
-  view <- snakemake@wildcards$view_type
-  
-  plot_params <- snakemake@params[[1]]
+  model <- snakemake@wildcards$view_type
   
   metadata_fp <- snakemake@input[[1]]
   result_folders <- unlist(snakemake@input[2:length(snakemake@input)])
   
+  importances_fp <- snakemake@output[[1]]
+  interactions_fp <- snakemake@output[[2]]
+  
 }else{
   tissue <- 'brain'
-  view <- 'pathwaysCT'
-  
-  plot_params <- list(trim = 1, cutoff = 1)
+  model <- 'pathwaysCT'
   
   samples <- list.files(paste('data/original/ST/visium_data', tissue, sep = '_')) %>% sort()
   
@@ -162,71 +164,10 @@ if(tissue == 'brain'){
   metadata$sample <- gsub('-', '_', metadata$sample)
 }
 
-if(view == 'functional' | view == 'pathwaysCT'){
-  intra_name <- 'intra_act'
-  cleaning <- TRUE
-  
-}else if (view == 'celltype'){
-  intra_name <- 'intra'
-  cleaning <- FALSE
-  
-}
+results <- result_folders %>% collect_results() %>% reformat_samples()
 
 
-results <- lapply(result_folders %>% collect_results(), function(x){
-  if('view' %in% colnames(x)){
-    x$view <- gsub('[[:digit:]]+', '', x$view)
-    x$view <- gsub('\\.$', '', x$view)
-  }
-  return(x)
-}) %>% reformat_samples()
-
-imp.signature <- extract_signature(results, type = "importance", trim = 2)
-
-imp.signature.pca <- prcomp(imp.signature %>% select(-sample))
-
-# plots -------------------------------------------------------------------
-
-if(exists("snakemake")) pdf(snakemake@output[[1]])
-ggplot(
-  left_join(bind_cols(sample = metadata %>%  pull(sample), imp.signature.pca$x), metadata, by = 'sample'),
-  aes(x = PC1, y = PC2)
-) +
-  geom_point(aes(color = as.factor(condition)), size = 1) +
-  labs(color = "Condition") +
-  theme_classic()
-
-
-
-ggplot(
-  left_join(bind_cols(sample = metadata %>%  pull(sample), imp.signature.pca$x), metadata, by = 'sample'),
-  aes(x = PC1, y = PC2)
-) +
-  geom_point(aes(color = as.factor(mouse)), size = 1) +
-  labs(color = "Mouse") +
-  theme_classic()
-
-
-results %>% plot_improvement_stats()
-
-results %>% plot_improvement_stats("intra.R2")
-
-results %>% plot_view_contributions(trim = 1)
-
-results %>% plot_interaction_heatmap(intra_name, trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
-
-results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
-
-
-fviz_pca_var(imp.signature.pca,
-             col.var = "cos2", select.var = list(cos2 = 15), repel = TRUE,
-             gradient.cols = c("#666666", "#377EB8", "#E41A1C"), col.circle = NA
-) + theme_classic()
-
-# if(exists("snakemake")) dev.off()
-
-
-# by condition plots ------------------------------------------------------
+# grouped results ---------------------------------------------------------
 
 
 grouped.results <- lapply(levels(metadata$condition), function(group){
@@ -234,14 +175,15 @@ grouped.results <- lapply(levels(metadata$condition), function(group){
   group.samples <- metadata %>% filter(condition == group)
   keep <- which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
   
-  results <- result_folders[keep] %>% collect_results()
+  res <- result_folders[keep] %>% collect_results()
   
-  results <- results %>% reformat_samples()
+  res <- res %>% reformat_samples()
 })
 
 names(grouped.results) <- levels(metadata$condition)
 
-contrast.interactions <- names(grouped.results) %>%  purrr::map_dfr(function(to.group){
+importances <- list()
+diff.interactions <- names(grouped.results) %>%  purrr::map_dfr(function(to.group){
   
   from.group <- names(grouped.results)[which(!grepl(to.group, names(grouped.results)))]
   
@@ -251,73 +193,29 @@ contrast.interactions <- names(grouped.results) %>%  purrr::map_dfr(function(to.
     tidyr::unite(col = 'Interaction', .data$view, .data$Predictor, .data$Target, sep = '_')
   
   # extract the importances per sample for these interactions and add metadata
-  importances <- results$importances %>% tidyr::unite(col = 'Interaction', .data$view, .data$Predictor, .data$Target, remove = FALSE) %>% 
+  imp <- results$importances %>% tidyr::unite(col = 'Interaction', .data$view, .data$Predictor, .data$Target, remove = FALSE) %>% 
     dplyr::filter(.data$Interaction %in% (interactions %>% dplyr::pull(.data$Interaction))) %>% dplyr::select(-.data$Predictor, -.data$Target) %>% dplyr::left_join(metadata, by = 'sample')
   
+  importances <<- append(importances, list(imp))
+  
   # t-test over conditions and do BH p.value adjustment
-  stats <- importances %>% dplyr::group_by(.data$Interaction) %>% rstatix::t_test(data =., Importance ~ condition) %>% 
-    dplyr::left_join(importances %>% dplyr::select(.data$Interaction, .data$view) %>% dplyr::distinct(), by = 'Interaction') %>% dplyr::group_by(.data$view) %>%
-    rstatix::adjust_pvalue(method = "BH") %>% dplyr::select(.data$view, .data$Interaction, .data$statistic, .data$p, .data$p.adj) %>% dplyr::rename(t.value = .data$statistic, p.value = .data$p) %>% dplyr::ungroup()
+  stats <- imp %>% dplyr::group_by(.data$Interaction) %>% rstatix::t_test(data =., Importance ~ condition) %>% 
+    dplyr::left_join(imp %>% dplyr::select(.data$Interaction, .data$view) %>% dplyr::distinct(), by = 'Interaction') %>% dplyr::group_by(.data$view) %>%
+    rstatix::adjust_pvalue(method = "BH") %>% dplyr::select(.data$view, .data$Interaction, .data$statistic, .data$p, .data$p.adj) %>%
+    dplyr::rename(t.value = .data$statistic, p.value = .data$p) %>% dplyr::ungroup() %>% dplyr::mutate(only.in = to.group)
   
   stats %>% plyr::adply(.margins = 1, function(x){
     x$Interaction <- base::gsub(paste('^', x$view, '_' , sep=''), '', x$Interaction) 
     return(x) 
-  }) %>% tidyr::separate(col=.data$Interaction, into = c('Predictor', 'Target'), sep = '_') %>% dplyr::mutate(only.in = to.group)
-  
-})
-
-views <- contrast.interactions %>% dplyr::pull(.data$view) %>% unique() %>% sort()
-
-views %>% purrr::walk(function(current.view){
-  
-  long.data <- contrast.interactions %>% dplyr::filter(.data$view == current.view) %>%
-    dplyr::mutate(sig = -log10(.data$p.adj) * sign(.data$t.value), is.sig.05 = .data$p.adj < 0.05, is.sig.1 = .data$p.adj < 0.1)
-  
-  inter.plot <- long.data %>% ggplot2::ggplot(ggplot2::aes(x = .data$Predictor, y = .data$Target)) +
-    ggplot2::geom_tile(ggplot2::aes(fill = .data$sig)) + ggplot2::theme_classic() + 
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1)) + ggplot2::coord_equal() + 
-    ggplot2::scale_fill_gradient2(low = "red", mid = "white", high = "#8DA0CB", midpoint = 0) + ggplot2::labs(fill='-log10(p)') +
-    geom_tile(data = long.data %>% dplyr::filter(.data$is.sig.05), aes(fill = .data$sig, color = is.sig.05), size = 1) + 
-    scale_color_manual(guide = FALSE, values = c(`TRUE` = "black")) +
-    ggplot2::ggtitle(paste('Condition specific interactions in', current.view))
-  
-  print(inter.plot)
-  
-})
-if(exists("snakemake")) dev.off()
-
-
+  })  %>% tidyr::separate(col=.data$Interaction, into = c('Predictor', 'Target'), sep = '_')
+})%>% dplyr::mutate(model = model)
+importances <- dplyr::bind_rows(importances) %>% dplyr::mutate(model = model)
 
 if(exists("snakemake")){
-  output_filenames <- snakemake@output[2:length(snakemake@output)]
-}else{
-  output_filenames <- c('test1.pdf', 'test2.pdf')
+  
+  write.csv(importances, file = importances_fp, sep = ",")
+  write.csv(diff.interactions, file = interactions_fp, sep = ",")
+  
 }
-
-mapply(function(results, output_fp){
-
-  if(exists("snakemake")) pdf(output_fp)
-
-  results %>% plot_improvement_stats()
-
-  results %>% plot_improvement_stats("intra.R2")
-
-  results %>% plot_view_contributions(trim = 1)
-
-  results %>% plot_interaction_heatmap(intra_name, trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
-
-  results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
-
-  if(exists("snakemake")) dev.off()
-
-  return()
-
-}, grouped.results, output_filenames)
-
-
-
-
-
-
 
 

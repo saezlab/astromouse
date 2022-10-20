@@ -1,0 +1,177 @@
+# %%
+import scanpy as sc
+import pandas as pd
+import decoupler as dc
+from glob import glob
+import re
+import numpy as np
+import os
+
+# %%
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.backends.backend_pdf import PdfPages
+
+# %%
+if 'snakemake' in locals():
+    tissue = snakemake.wildcards[0]
+    adata_fp = snakemake.input[0]
+    pathways_fp = snakemake.input[1]
+    TFs_fp = snakemake.input[2]
+    cellprop_fp = snakemake.input[3]
+
+    
+    importances_fp = [snakemake.input[4]]
+    interactions_fp = [snakemake.input[5]]
+
+    significance_threshold = snakemake.params[0]
+
+    output_files = snakemake.output
+
+else:
+    tissue = 'brain'
+    adata_fp = 'results/ST/{0}_wImages.h5ad'.format(tissue)
+    importances_fp = sorted(glob('results/Misty/{0}/*_importances.csv'.format(tissue)))
+    interactions_fp = sorted(glob('results/Misty/{0}/*_diffInteractions.csv'.format(tissue)))
+    pathways_fp = 'results/ST/functional/{0}_activities_pathways.csv'.format(tissue)
+    TFs_fp = 'results/ST/functional/{0}_activities_TFs.csv'.format(tissue)
+    cellprop_fp = 'results/ST/ST_{0}_deconvoluted.csv'.format(tissue)
+
+    interactions_fp = interactions_fp[0:1]
+    importances_fp = importances_fp[0:1]
+
+    output_files = 'celltype.test'
+
+    significance_threshold = 0.05
+
+functional_fps = [pathways_fp, TFs_fp, cellprop_fp]
+
+# %%
+models = [os.path.basename(fp).split('_')[0] for fp in interactions_fp]
+
+# %%
+adata = sc.read_h5ad(adata_fp)
+del adata.layers['SCT']
+adata
+
+# %%
+dfs = [pd.read_csv(file, index_col=0, sep=',') for file in functional_fps]
+activities = pd.concat(dfs, join='outer', axis=1)
+activities = activities.loc[adata.obs.index,:]
+activities.columns = [re.sub("-", "", func) for func in activities.columns]
+
+adata.obsm['acts'] = activities
+acts = dc.get_acts(adata, 'acts')
+acts
+
+# %%
+df = [pd.read_csv(file, index_col=0, sep=',') for file in interactions_fp]
+df = pd.concat(df, join='outer', axis=0)
+mask = pd.DataFrame({'target':[ (target in activities.columns) for target in df['Target'] ],\
+    'pred': [ (predictor in activities.columns) for predictor in df['Predictor'] ],\
+    'sig': (df['p.adj'] <= significance_threshold)})
+df = df[mask.all(axis= 'columns')]
+
+# %%
+interactions = {}
+for model in models:
+    temp = df[df['model']==model]
+    if temp.shape[0] >0:
+        interactions[model] = temp
+
+# %%
+df = [pd.read_csv(file, index_col=0, sep=',') for file in importances_fp]
+df = pd.concat(df, join='outer', axis=0)
+
+# %%
+importances = {}
+for model in models:
+    temp = df[df['model']==model]
+    if temp.shape[0] >0:
+        importances[model] = temp
+
+# %%
+for key in interactions.keys():
+    with PdfPages(output_files[0]) as output_pdf:
+        current_inter = interactions[key].copy()
+        current_inter['group'] = current_inter['view'] + '_' + current_inter['Predictor']
+        current_inter = current_inter.sort_values('group', axis = 0)
+
+        current_imp = importances[key].copy()
+
+        # select predictors to plot together
+        ordered_predictors = current_inter.groupby(['view','group']).agg({'p.adj' : min}).sort_values(['view', 'p.adj']).reset_index().groupby('view').head(5)['group'].to_list()
+
+        for current_pred in ordered_predictors:
+            inter_to_plot = current_inter[current_inter['group'] == current_pred].head(5).copy().reset_index()
+            inter_to_plot['inter'] = inter_to_plot['view'] + '_' + inter_to_plot['Predictor'] + '_' + inter_to_plot['Target']
+
+            fig, axs = plt.subplots(inter_to_plot.shape[0], 5, figsize=(25, inter_to_plot.shape[0] * 5))
+
+            mice = []
+
+            #choosing which mice to plot
+            #make boxplots
+            for index, row in inter_to_plot.iterrows():
+                imp_to_plot = current_imp[current_imp['Interaction'] == row['inter']].copy()
+                imp_to_plot = imp_to_plot.sort_values('mouse')
+
+                flight_mouse = imp_to_plot[imp_to_plot['condition'] == 'Flight']
+                ground_mouse = imp_to_plot[imp_to_plot['condition'] == 'Control']
+
+                if np.sign(row['t.value']) > 0:
+                    asc = False
+                else:
+                    asc = True
+
+                flight_mouse = flight_mouse.sort_values('Importance', ascending = asc).head(1)
+                ground_mouse = ground_mouse.sort_values('Importance', ascending = (not asc)).head(1)
+                
+                idx = [0 if inter_to_plot.shape[0] == 1 else (index, 0)]
+                sns.boxplot(x = "condition", y = "Importance", data = imp_to_plot, ax = axs[idx[0]],\
+                    color = 'lightgrey', fliersize = 0, order = ['Flight', 'Control'], width = 0.6)
+
+                sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, hue = 'mouse', ax = axs[idx[0]], order = ['Flight', 'Control'])
+                axs[idx[0]].set_title(row['Predictor'] + ' -> ' + row['Target'])
+
+                mice.append(flight_mouse)
+                mice.append(ground_mouse)
+
+            #pool mice to plot
+            meta = pd.merge(pd.concat(mice, join='outer', axis=0), inter_to_plot, how = 'left', left_on='Interaction', right_on='inter')
+            func_to_plot = list(set(meta['Predictor'].to_list() + meta['Target'].to_list())) #which features will be plotted
+
+            #identify limits for colorbars
+            lims = pd.DataFrame({ 'llim' : [np.min(acts[:,f].X) for f in func_to_plot],\
+            'ulim': [np.max(acts[:,f].X) for f in func_to_plot]},\
+                index = func_to_plot)
+            lims['lim'] = [np.max(abs(acts[:,f].X)) for f in func_to_plot]
+
+            # iterate over rows (interactions) of the plot
+            for index, row in inter_to_plot.iterrows():
+                mice_to_plot = meta[meta['Interaction']  == row['inter']].sort_values('condition', ascending=False)
+                
+                for (_, mouse), plot_column in zip(mice_to_plot.iterrows(), [1,3]):
+                    idx = [plot_column if inter_to_plot.shape[0] == 1 else (index, plot_column)]
+                    sc.pl.spatial(acts[acts.obs.library_id == mouse['sample'], :], img_key=None, library_id=mouse['sample'],\
+                        color=mouse['Predictor'], size=1.5, legend_loc=None, show=False, vmin = (lims.loc[mouse['Predictor'], 'llim']*1.1),\
+                        vmax = (lims.loc[mouse['Predictor'], 'ulim']*1.1), ax=axs[idx[0]])
+                    axs[idx[0]].set_title(mouse['mouse'] + ': ' + mouse['Predictor'])
+                    axs[idx[0]].set_facecolor('#D9D9D9')
+                    axs[idx[0]].set_ylabel('')
+                    axs[idx[0]].set_xlabel('')
+
+                    idx = [plot_column  + 1 if inter_to_plot.shape[0] == 1 else (index, plot_column + 1)]
+                    sc.pl.spatial( acts[acts.obs.library_id == mouse['sample'], :], img_key=None, library_id=mouse['sample'],\
+                        color=mouse['Target'], size=1.5, legend_loc=None, show=False, vmin = (lims.loc[mouse['Target'], 'llim']*1.1),\
+                        vmax = (lims.loc[mouse['Target'], 'ulim']*1.1), ax=axs[idx[0]])
+                    axs[idx[0]].set_title(mouse['mouse'] + ': ' + mouse['Target'])
+                    axs[idx[0]].set_facecolor('#D9D9D9')
+                    axs[idx[0]].set_ylabel('')
+                    axs[idx[0]].set_xlabel('')
+                
+            plt.suptitle('Diff. interactions in ' + inter_to_plot['view'].to_list()[0] + ' for ' + current_pred.split('_')[-1], fontsize = 15)
+            plt.tight_layout()
+            output_pdf.savefig(fig)
+            plt.close()
+                
