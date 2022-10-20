@@ -134,7 +134,10 @@ for key in interactions.keys():
                 sns.boxplot(x = "condition", y = "Importance", data = imp_to_plot, ax = axs[idx[0]],\
                     color = 'lightgrey', fliersize = 0, order = ['Flight', 'Control'], width = 0.6)
 
-                sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, hue = 'mouse', ax = axs[idx[0]], order = ['Flight', 'Control'])
+                if tissue == 'brain':
+                    sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, hue = 'mouse', ax = axs[idx[0]], order = ['Flight', 'Control'])
+                else:
+                    sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, ax = axs[idx[0]], order = ['Flight', 'Control'])
                 axs[idx[0]].set_title(row['Predictor'] + ' -> ' + row['Target'])
 
                 mice.append(flight_mouse)
