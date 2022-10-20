@@ -43,6 +43,10 @@ adata = adata[:,hvg]
 adata.X = adata.layers['counts'].copy()
 adata.obs['tissue'] = 'tissue'
 
+# Run UMAP
+sc.pp.neighbors(adata, use_rep='SCT_CC_HARMONY')
+sc.tl.umap(adata)
+
 # Instantiate Oracle object
 oracle.import_anndata_as_raw_count(adata=adata,
                                    cluster_column_name="tissue",
