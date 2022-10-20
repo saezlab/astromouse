@@ -77,7 +77,7 @@ rule build_grn:
     # resources:
     #     mem_mb=48000
     shell:
-        "python workflow/scripts/celloracle/build_grn.py -m {input.mdata} -b {input.base_grn} -l {output}"
+        "python workflow/scripts/celloracle/build_grn.py -m {input.mdata} -b {input.base_grn} -t {wildcards.tissue} -l {output}"
 
 rule filter_grn:
     input:
@@ -87,14 +87,12 @@ rule filter_grn:
     params:
         thr_edge_pval=config['celloracle']['thr_edge_pval'],
         thr_top_edges=config['celloracle']['thr_top_edges'],
-        path_out='results/MO/celloracle/{tissue}/',
     output:
-        "logs/filter_grn/{tissue}/log.out"
+        path_out= directory('results/MO/celloracle/{tissue}/GRNs/')
     # resources:
     #     mem_mb=48000
     shell:
         """
-        python workflow/scripts/celloracle/filter_grn.py -l {input} -p {params.thr_edge_pval} -t {params.thr_top_edges} -o {params.path_out}
-        echo 'Done' > {output}
+        python workflow/scripts/celloracle/filter_grn.py -l {input} -p {params.thr_edge_pval} -t {params.thr_top_edges} -o {output.path_out}
         """
 

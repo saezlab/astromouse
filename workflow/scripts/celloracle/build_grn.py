@@ -12,11 +12,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-m','--path_mdata', required=True)
 parser.add_argument('-b','--base_grn', required=True)
 parser.add_argument('-l','--path_links', required=True)
+parser.add_argument('-t','--tissue', required=True)
 args = vars(parser.parse_args())
 
 path_mdata = args['path_mdata']
 path_base_grn = args['base_grn']
 path_links = args['path_links']
+tissue_type = args['tissue']
 n_comps = 50
 
 # Read rna adata
@@ -41,7 +43,7 @@ adata.var['highly_variable'] = [g in hvg for g in adata.var.index]
 adata.var = adata.var[['highly_variable','highly_variable_nbatches']]
 adata = adata[:,hvg]
 adata.X = adata.layers['counts'].copy()
-adata.obs['tissue'] = 'tissue'
+adata.obs['tissue'] = tissue_type
 
 # Run UMAP
 sc.pp.neighbors(adata, use_rep='SCT_CC_HARMONY')

@@ -3,6 +3,7 @@ import numpy as np
 import celloracle as co
 import os
 import argparse
+import shutil
 
 
 # Init args
@@ -17,6 +18,11 @@ path_links = args['path_links']
 thr_edge_pval = float(args['thr_edge_pval'])
 thr_top_edges = int(args['thr_top_edges'])
 path_grns = args['path_grns']
+
+if os.path.isdir(path_grns):
+    shutil.rmtree(path_grns)
+else:
+    os.mkdir(path_grns)
 
 # Load links
 links = co.load_hdf5(file_path=path_links)
