@@ -93,14 +93,26 @@ rule get_dif_interactions:
     script:
         "../scripts/misty/get_differential_interactions.R"
 
+
+def dif_interactions_inputs(wildcards):
+    files = {'data': 'results/ST/{wildcards.tissue}_wImages.h5ad'.format(wildcards=wildcards),\
+            'importances': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_importances.csv'.format(wildcards=wildcards),\
+            'diffInteractions': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_diffInteractions.csv'.format(wildcards=wildcards)\
+            }
+    if (wildcards.view_type == 'celltype' or wildcards.view_type == 'pathwaysCT'):
+        files['cellprops'] = 'results/ST/ST_{wildcards.tissue}_deconvoluted.csv'.format(wildcards=wildcards)
+
+    if (wildcards.view_type == 'functional' or wildcards.view_type == 'pathwaysCT'):
+        files['pathways'] = 'results/ST/functional/{wildcards.tissue}_activities_pathways.csv'.format(wildcards=wildcards)
+
+    if (wildcards.view_type == 'functional'):
+        files['GRNs'] = 'results/ST/functional/{wildcards.tissue}_activities_GRNs.csv'.format(wildcards=wildcards)
+
+    return files
+
 rule plot_dif_interactions:
     input:
-        'results/ST/{tissue}_wImages.h5ad',
-        'results/ST/functional/{tissue}_activities_pathways.csv',
-        'results/ST/functional/{tissue}_activities_GRNs.csv',
-        'results/ST/ST_{tissue}_deconvoluted.csv',
-        'results/Misty/{tissue}/{view_type}_importances.csv',
-        'results/Misty/{tissue}/{view_type}_diffInteractions.csv'
+        unpack(dif_interactions_inputs)
     params:
         sign= 0.05
     output: 

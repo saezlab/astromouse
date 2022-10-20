@@ -15,14 +15,15 @@ from matplotlib.backends.backend_pdf import PdfPages
 # %%
 if 'snakemake' in locals():
     tissue = snakemake.wildcards[0]
-    adata_fp = snakemake.input[0]
-    pathways_fp = snakemake.input[1]
-    TFs_fp = snakemake.input[2]
-    cellprop_fp = snakemake.input[3]
+    adata_fp = snakemake.input.get('data')
+
+    pathways_fp = snakemake.input.get('pathways')
+    TFs_fp = snakemake.input.get('GRNs')
+    cellprop_fp = snakemake.input.get('cellprops')
 
     
-    importances_fp = [snakemake.input[4]]
-    interactions_fp = [snakemake.input[5]]
+    importances_fp = [snakemake.input.get('importances')]
+    interactions_fp = [snakemake.input.get('diffInteractions')]
 
     significance_threshold = snakemake.params[0]
 
@@ -45,6 +46,8 @@ else:
     significance_threshold = 0.05
 
 functional_fps = [pathways_fp, TFs_fp, cellprop_fp]
+functional_fps = [f for f in functional_fps if f is not None]
+
 
 # %%
 models = [os.path.basename(fp).split('_')[0] for fp in interactions_fp]
