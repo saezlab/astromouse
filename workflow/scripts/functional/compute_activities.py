@@ -53,7 +53,7 @@ elif network == 'GRNs':
     if net_fp == '':
         raise ValueError('No file was provided for the GRN regulons!')
     else:
-        model = pd.read_csv(os.path.join(net_fp, tissue + '.csv'), sep=',', index_col=0)
+        model = pd.read_csv(os.path.join(net_fp, tissue + '.csv'), sep=',')
 else:
     raise ValueError('The "network" wildcard can only take on "pathways", "GRNS" or "TFs" as value, to run either Progeny, celloracle GRNs or Dorothea regulons')
 
