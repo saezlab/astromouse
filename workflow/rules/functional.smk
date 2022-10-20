@@ -1,11 +1,17 @@
+
+def activities_inputs(wildcards):
+    files = {'data': 'results/ST/{wildcards.tissue}_wImages.h5ad'.format(wildcards=wildcards)}
+    if wildcards.network == 'GRNs':
+        files['net'] = 'results/MO/celloracle/{wildcards.tissue}/GRNs/'.format(wildcards=wildcards)
+    return files
+
 rule plot_pathways:
     input:
-        'results/ST/{tissue}_wImages.h5ad'
-    output:
-        'plots/functional/{tissue}_pathways.pdf'
+        unpack(activities_inputs)
     params:
-        normalisation = config['functional'].get("normalisation", 'log1p'), #or SCT
-        top_genes = config['functional'].get("pathways_top_gene", 300)
+        lambda w: config['functional'][w.network]
+    output:
+        'plots/functional/{tissue}_{network}.pdf'
     conda:
         "../envs/astromouse.yml"
     resources:
@@ -15,14 +21,11 @@ rule plot_pathways:
 
 rule get_PDactivities:
     input:
-        data = 'results/ST/{tissue}_wImages.h5ad'
+        unpack(activities_inputs)
     output:
         act = 'results/ST/functional/{tissue}_activities_{network}.csv' #network being either 'pathways' or 'TFs'
     params:
-        normalisation = config['functional'].get("normalisation", 'log1p'), #or SCT
-        top_genes = config['functional'].get("pathways_top_gene", 300),
-        TF_conf = config['functional'].get("TF_confidence", 'ABC'),
-        method = config['functional'].get("pathways_method", 'mlm')
+        lambda w: config['functional'][w.network]
     conda:
         "../envs/astromouse.yml"
     script:

@@ -2,57 +2,72 @@ import scanpy as sc
 import pandas as pd
 import decoupler as dc
 import numpy as np
+import os
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
 # Define input and output files
 if 'snakemake' in locals():
+    tissue = snakemake.wildcards[0]
+    net_fp = snakemake.input.get('net', '')
+
+    network = snakemake.wildcards[1]
     adata_fp = snakemake.input[0]
     output_fp = snakemake.output[0]
-    tissue = snakemake.wildcards[0]
-    normalisation = snakemake.params[0]
-    top_genes = snakemake.params[1]
+    
+    conf = snakemake.params[0]
+
+else:
+    tissue = 'brain'
+    network = 'TFs'
+    adata_fp = 'data/working/ST/{0}_wImages.h5ad'.format(tissue)
+    output_fp = 'test.csv'
+    
+    conf = {'normalisation': 'log1p', 'top_targets': 300, 'method': 'mlm'}
 
 
-adata_spatial = sc.read_h5ad(adata_fp)
+# %%
+adata = sc.read_h5ad(adata_fp)
 
-if normalisation == 'log1p':
-    sc.pp.normalize_total(adata_spatial, inplace=True)
-    sc.pp.log1p(adata_spatial)
-elif normalisation == 'SCT':
-    adata_spatial.layers['counts'] = adata_spatial.X
-    adata_spatial.X = adata_spatial.layers['SCT'].copy()
-    del adata_spatial.layers['SCT']
-    adata_spatial
+# %%
+#Defining normalisation
+if conf.get('normalisation') == 'log1p':
+    print('INFO: using log1p normalised counts')
+    sc.pp.normalize_total(adata, inplace=True)
+    sc.pp.log1p(adata)
+elif conf.get('normalisation') == 'SCT':
+    print('INFO: using SCT normalised counts')
+    adata.layers['counts'] = adata.X
+    adata.X = adata.layers['SCT'].copy()
+    del adata.layers['SCT']
+elif conf.get('normalisation') is None:
+    raise ValueError('The config file is missing a normalisation method for {0}. Set it to either \'log1p\' or \'SCT\'.'.format(network))
+else:
+    raise ValueError('The normalisation method \'{0}\' is not implemented. Set it to either \'log1p\' or \'SCT\'.'.format(conf.get('normalisation')))
+
+# %%
+# Load regulon network
+if network == 'pathways':
+    model = dc.get_progeny(organism='mouse', top=conf.get('top_targets'))
+elif network == 'TFs':
+    model = dc.get_dorothea(organism='mouse', levels=[c for c in conf.get('levels')])
+elif network == 'GRNs':
+    if net_fp == '':
+        raise ValueError('No file was provided for the GRN regulons!')
+    else:
+        model = pd.read_csv(os.path.join(net_fp, tissue + '.csv'), sep=',', index_col=0)
+else:
+    raise ValueError('The "network" wildcard can only take on "pathways", "GRNS" or "TFs" as value, to run either Progeny, celloracle GRNs or Dorothea regulons')
 
 
-# fig, axs = plt.subplots(3, 4, figsize=(23, 15))
-# axs = axs.flatten()
+# %%
+dc.decouple(mat=adata, net=model, source='source', target='target', weight='weight', methods = conf.get('method'),  verbose=True, use_raw=False)
 
-# for i, library in enumerate(
-#     adata_spatial.obs.filter(['library_id','mouse'], axis = 1).drop_duplicates().sort_values('mouse')['library_id']
-#     #[os.path.basename(os.path.dirname(sample)) for sample in sample_paths]
-# ):
-#     ad = adata_spatial[adata_spatial.obs.library_id == library, :]#.copy()
-#     sc.pl.spatial(
-#         ad,
-#         img_key=None,#"hires",
-#         library_id=library,
-#         color="seurat_clusters",
-#         size=1.5,
-#         palette=sc.pl.palettes.default_20,
-#         legend_loc=None,
-#         show=False,
-#         ax=axs[i],
-#     )
+# %%
+print(adata)
 
-# plt.tight_layout()
-
-model = dc.get_progeny(organism='mouse', top=top_genes)
-dc.run_mlm(mat=adata_spatial, net=model, source='source', target='target', weight='weight', verbose=True, use_raw=False)
-
-acts = dc.get_acts(adata_spatial, obsm_key='mlm_estimate')
+acts = dc.get_acts(adata, obsm_key='{0}_estimate'.format(conf.get('method')))
 print(acts)
 
 lims = pd.DataFrame({ 'llim' : [np.min(acts.X[:,ii]) for ii in range(acts.n_vars)], 'ulim': [np.max(acts.X[:,ii]) for ii in range(acts.n_vars)]}, index = acts.var_names.values)

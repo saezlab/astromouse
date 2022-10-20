@@ -13,7 +13,7 @@ rule get_coords:
 rule get_func_views:
     input:
         'results/ST/Misty/{tissue}_coordinates.csv',
-        'results/ST/functional/{tissue}_activities_TFs.csv',
+        'results/ST/functional/{tissue}_activities_GRNs.csv',
         'results/ST/functional/{tissue}_activities_pathways.csv'
     params:
         skip = 'intra'
@@ -70,9 +70,9 @@ rule plot_misty_results:
         'data/original/ST/metadata_visium_{tissue}.csv',
         lambda w: expand('results/ST/Misty/{{tissue}}/{sample}/{{view_type}}_misty_model', sample = config['samples'][w.tissue])
     output: 
-        'plots/Misty/{tissue}/{view_type}_misty.pdf'
-        # 'plots/Misty/{tissue}/{view_type}_misty_Flight.pdf',
-        # 'plots/Misty/{tissue}/{view_type}_misty_Control.pdf'
+        'plots/Misty/{tissue}/{view_type}_misty.pdf',
+        'plots/Misty/{tissue}/{view_type}_misty_Flight.pdf',
+        'plots/Misty/{tissue}/{view_type}_misty_Control.pdf'
 
     params:
         lambda w: config['misty'][w.view_type]['plots'][w.tissue]
@@ -81,3 +81,31 @@ rule plot_misty_results:
     script:
         "../scripts/misty/plot_model_results.R"
 
+rule get_dif_interactions:
+    input:
+        'data/original/ST/metadata_visium_{tissue}.csv',
+        lambda w: expand('results/ST/Misty/{{tissue}}/{sample}/{{view_type}}_misty_model', sample = config['samples'][w.tissue])
+    output: 
+        'results/Misty/{tissue}/{view_type}_importances.csv',
+        'results/Misty/{tissue}/{view_type}_diffInteractions.csv'
+    conda:
+        "../envs/misty.yml"
+    script:
+        "../scripts/misty/get_differential_interactions.R"
+
+rule plot_dif_interactions:
+    input:
+        'results/ST/{tissue}_wImages.h5ad',
+        'results/ST/functional/{tissue}_activities_pathways.csv',
+        'results/ST/functional/{tissue}_activities_GRNs.csv',
+        'results/ST/ST_{tissue}_deconvoluted.csv',
+        'results/Misty/{tissue}/{view_type}_importances.csv',
+        'results/Misty/{tissue}/{view_type}_diffInteractions.csv'
+    params:
+        sign= 0.05
+    output: 
+        'plots/Misty/{tissue}/{view_type}_diffplots.pdf'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        "../scripts/misty/plot_differential_interactions.py"

@@ -17,12 +17,15 @@ deconvolution:
     assay: 'hvg2000'
 
 functional:
-    normalisation: 'log1p' #or SCT
-    pathways_top_gene: 300
-    pathways_method: 'mlm'
+    TFs: {'normalisation': 'log1p', 'method': 'mlm', levels: 'ABC'}
+    pathways: {normalisation: 'log1p', method: 'mlm', top_targets: 300}
+    GRNs: {normalisation: 'log1p', method: 'mlm'}
 
 misty:
     random_seed: 42
+    views:
+        brain: ['celltype', 'functional', 'pathwaysCT']
+        heart: ['functional']
     functional:
         bypass_intra: True
         plots:
