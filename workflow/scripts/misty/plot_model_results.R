@@ -206,17 +206,17 @@ ggplot(
   labs(color = "Mouse") +
   theme_classic()
 
+if(view != 'functional'){
+  results %>% plot_improvement_stats()
 
-results %>% plot_improvement_stats()
+  results %>% plot_improvement_stats("intra.R2")
 
-results %>% plot_improvement_stats("intra.R2")
+  results %>% plot_view_contributions(trim = 1)
 
-results %>% plot_view_contributions(trim = 1)
+  results %>% plot_interaction_heatmap(intra_name, trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
 
-results %>% plot_interaction_heatmap(intra_name, trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
-
-results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
-
+  results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
+}
 
 fviz_pca_var(imp.signature.pca,
              col.var = "cos2", select.var = list(cos2 = 15), repel = TRUE,
@@ -297,17 +297,17 @@ if(exists("snakemake")){
 mapply(function(results, output_fp){
 
   if(exists("snakemake")) pdf(output_fp)
+  if(view != 'functional'){
+    results %>% plot_improvement_stats()
 
-  results %>% plot_improvement_stats()
+    results %>% plot_improvement_stats("intra.R2")
 
-  results %>% plot_improvement_stats("intra.R2")
+    results %>% plot_view_contributions(trim = 1)
 
-  results %>% plot_view_contributions(trim = 1)
+    results %>% plot_interaction_heatmap(intra_name, trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
 
-  results %>% plot_interaction_heatmap(intra_name, trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
-
-  results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
-
+    results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
+  }
   if(exists("snakemake")) dev.off()
 
   return()
