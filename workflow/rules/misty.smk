@@ -119,5 +119,7 @@ rule plot_dif_interactions:
         'plots/Misty/{tissue}/{view_type}_diffplots.pdf'
     conda:
         "../envs/astromouse.yml"
+    resources:
+        mem_mb=25000
     script:
         "../scripts/misty/plot_differential_interactions.py"
