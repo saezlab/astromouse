@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import celloracle as co
 import mudata
+import scanpy as sc
 import os
 import argparse
 
