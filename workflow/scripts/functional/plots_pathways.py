@@ -100,7 +100,7 @@ if tissue == 'brain':
                     # vmin = (lims.loc[pathway, 'llim']*1.1),
                     # vmax = (lims.loc[pathway, 'ulim']*1.1),
                     color_map = 'BrBG',
-                    colorbar_loc = None,
+                    # colorbar_loc = None,
                     # vcenter = 0,
                     ax=axs[i],
                 )
@@ -138,7 +138,7 @@ if tissue == 'heart':
                     # vmin = (lims.loc[pathway, 'llim']*1.1),
                     # vmax = (lims.loc[pathway, 'ulim']*1.1),
                     color_map = 'BrBG',
-                    colorbar_loc = None,
+                    # colorbar_loc = None,
                     # vcenter = 0,
                     ax=axs[i],
                 )
