@@ -97,10 +97,11 @@ if tissue == 'brain':
                     show=False,
                     # vmin = 0,
                     # vmax = 17589,
-                    vmin = (lims.loc[pathway, 'llim']*1.1),
-                    vmax = (lims.loc[pathway, 'ulim']*1.1),
+                    # vmin = (lims.loc[pathway, 'llim']*1.1),
+                    # vmax = (lims.loc[pathway, 'ulim']*1.1),
                     color_map = 'BrBG',
-                    vcenter = 0,
+                    colorbar_loc = None,
+                    # vcenter = 0,
                     ax=axs[i],
                 )
                 axs[i].set_title(ad.obs['mouse'][0])
@@ -134,10 +135,11 @@ if tissue == 'heart':
                     show=False,
                     # vmin = 0,
                     # vmax = 17589,
-                    vmin = (lims.loc[pathway, 'llim']*1.1),
-                    vmax = (lims.loc[pathway, 'ulim']*1.1),
+                    # vmin = (lims.loc[pathway, 'llim']*1.1),
+                    # vmax = (lims.loc[pathway, 'ulim']*1.1),
                     color_map = 'BrBG',
-                    vcenter = 0,
+                    colorbar_loc = None,
+                    # vcenter = 0,
                     ax=axs[i],
                 )
                 axs[i].set_title(pathway)
