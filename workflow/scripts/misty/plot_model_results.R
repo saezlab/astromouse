@@ -97,11 +97,16 @@ extract_contrast_interactions <- function (misty.results.from, misty.results.to,
   return(interactions)
 }
 
-reformat_samples <- function(misty.results){
+reformat_samples <- function(misty.results, view){
   
   results <- lapply(misty.results, function(x){
     if('sample' %in% colnames(x)){
-      x$sample <- x$sample %>% dirname() %>% basename()
+      if(view == 'celltype'){
+        x$sample <- x$sample %>% dirname() %>% dirname() %>% basename()  
+      }else{
+        x$sample <- x$sample %>% dirname() %>% basename()  
+      }
+      
     }
     return(x)
   })
@@ -125,7 +130,7 @@ if(exists("snakemake")){
   
 }else{
   tissue <- 'brain'
-  view <- 'pathwaysCT'
+  view <- 'celltype'
   
   plot_params <- list(trim = 1, cutoff = 1)
   
@@ -170,6 +175,10 @@ if(view == 'functional' | view == 'pathwaysCT'){
   intra_name <- 'intra'
   cleaning <- FALSE
   
+  result_folders <- lapply(result_folders, function(folder){
+    list.dirs(folder, recursive = FALSE)
+  }) %>% unlist()
+  
 }
 
 
@@ -179,7 +188,7 @@ results <- lapply(result_folders %>% collect_results(), function(x){
     x$view <- gsub('\\.$', '', x$view)
   }
   return(x)
-}) %>% reformat_samples()
+}) %>% reformat_samples(., view = view)
 
 imp.signature <- extract_signature(results, type = "importance", trim = 2)
 
@@ -232,11 +241,15 @@ fviz_pca_var(imp.signature.pca,
 grouped.results <- lapply(levels(metadata$condition), function(group){
   
   group.samples <- metadata %>% filter(condition == group)
-  keep <- which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
   
-  results <- result_folders[keep] %>% collect_results()
+  if(view == 'celltype'){
+    keep <- which(result_folders %>% dirname() %>% dirname() %>% basename() %in% group.samples$sample)
+  }else{
+    keep <- which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
+  }
+  group.results <- result_folders[keep] %>% collect_results()
   
-  results <- results %>% reformat_samples()
+  group.results <- group.results %>% reformat_samples(., view = view)
 })
 
 names(grouped.results) <- levels(metadata$condition)
