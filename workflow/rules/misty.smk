@@ -1,3 +1,8 @@
+############################
+#   Set up and run misty models
+#   sample by sample
+############################
+
 rule get_coords:
     input:
         data = 'results/ST/{tissue}_wImages.h5ad'
@@ -30,6 +35,8 @@ rule get_celltype_views:
         'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
         view = 'results/ST/Misty/{tissue}/{sample}/celltype_view.rds'
+    params:
+        cellprop_cutoff = config['misty']['celltype'].get('cellprop_cutoff', 0.05)
     conda:
         "../envs/misty.yml"
     script:
@@ -80,6 +87,11 @@ rule plot_misty_results:
         "../envs/misty.yml"
     script:
         "../scripts/misty/plot_model_results.R"
+
+############################
+#   Get interactions from misty models
+#   that are only found in one of the conditions
+############################
 
 rule get_dif_interactions:
     input:

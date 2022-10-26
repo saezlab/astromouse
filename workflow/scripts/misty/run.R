@@ -22,6 +22,8 @@ if(exists("snakemake")){
   view_fp <- snakemake@input$view
   cores <- snakemake@threads[[1]]
   output_dir <- snakemake@output[[1]]
+  
+  view_type <- snakemake@wildcards$view_type
 }else{
   #files for testing in Rstudio
   rs <- 42
@@ -31,6 +33,8 @@ if(exists("snakemake")){
   view_fp <- 'data/working/ST/Misty/brain/Sample_304_C1/functional_view.rds'
   cores <- 6
   output_dir <- "mistyTest"
+  
+  view_type <- snakemake@wildcards$view_type
 }
 
 
@@ -54,7 +58,25 @@ lapply(names(misty.views), function(view){
 # run misty ---------------------------------------------------------------
 
 cat("DEBUG: started running misty with seed", rs,"\nbypass.intra set to:", bypass_intra, "\noutput dir is:", output_dir, "\n")
-misty.views %>% run_misty(results.folder = output_dir, seed = rs, bypass.intra = bypass_intra, verbose = FALSE)
+
+if(view_type == 'celltype'){
+  
+  lapply(colnames(misty.views$intraview$data), function(target){
+    
+    temp.views <- misty.views %>% filter_views(NA, view = 'mask', .data[[target]]) %>% remove_views('mask')
+    
+    temp.views %>% run_misty(results.folder = paste(output_dir, target, sep = '/'), seed = rs, bypass.intra = bypass_intra, verbose = FALSE, target.subset = target)
+    
+  })
+  
+  
+}else{
+  
+  misty.views %>% run_misty(results.folder = output_dir, seed = rs, bypass.intra = bypass_intra, verbose = FALSE)
+}
+
+
+
 cat("INFO: finished building misty models; stored in", output_dir, "\n")
 
 

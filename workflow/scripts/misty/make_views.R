@@ -19,14 +19,8 @@ if(exists("snakemake")){
   print(datas_fp)
   
   if(length(datas_fp) == 3){
-    # names(datas_fp) <- c('coord', 'pathways', 'TFs')
-    
-    view <- 'functional'
     
   }else if(length(datas_fp) == 2){
-    # names(datas_fp) <- c('coord', 'CT')
-    
-    view <- 'cell_types'
     
   }else{
     stop('The input has to contain either 2 or 3 files, corresponding (in order) to coordinates, and then either intra+para data (in 1 file), or intra and paraview (2 files). ', length(datas_fp), ' files were given:\n', paste(datas_fp, collapse = ' '))
@@ -34,18 +28,27 @@ if(exists("snakemake")){
   
   sample <- basename(dirname(snakemake@output[[1]]))
   
+  output_fp <- snakemake@output[[1]]
+  
 }else{
   tissue <- 'brain'
   
-  coord_fp <- normalizePath(paste('data/working/ST/Misty/', tissue, '_coordinates.csv', sep=""))
-  pathways_fp <- normalizePath(paste('data/working/ST/functional/', tissue, '_activities_pathways.csv', sep=""))
-  tf_fp <- normalizePath(paste('data/working/ST/functional/', tissue, '_activities_TFs.csv', sep=""))
+  coord_fp <- normalizePath(paste('results/ST/Misty/', tissue, '_coordinates.csv', sep=""))
+  celltype_fp <- normalizePath(paste('results/ST/ST_', tissue, '_deconvoluted.csv', sep=""))
+  pathways_fp <- normalizePath(paste('results/ST/functional/', tissue, '_activities_pathways.csv', sep=""))
+  tf_fp <- normalizePath(paste('results/ST/functional/', tissue, '_activities_TFs.csv', sep=""))
   sample <- "Sample_304_C1"
-  view <- 'activities'
   
-  datas_fp <- list(coord = coord_fp, pathways = pathways_fp, TFs = tf_fp)
+  output_fp <- paste('results/ST/Misty/', tissue,'/', sample, '/celltype_view.rds', sep = '')
+  
+  datas_fp <- list(coord = coord_fp, cellprop = celltype_fp)
   
 }
+
+
+# determine view type -----------------------------------------------------
+
+view <- gsub('_view.rds','', basename(output_fp))
 
 
 
@@ -93,6 +96,7 @@ cat('Using', as.character(2*radius), 'as l parameter in paraview creation\n')
 
 # make views --------------------------------------------------------------
 
+# TODO: redo this for all three views for this project
 if(view == 'functional'){
   intra.view <- create_initial_view(datas[[2]])
   
@@ -102,9 +106,13 @@ if(view == 'functional'){
   
   misty.views <- intra.view %>% add_views(new.views = para.view)
   
-}else if (view == 'cell_types'){
+}else if (view == 'celltype'){
   
   misty.views <- create_initial_view(datas[[2]]) %>% add_paraview(datas[[1]] %>% select(x,y), l = radius * 2)
+  
+  mask <- misty.views$intraview$data %>% transmute_all(function(x){x > 0.05})
+  
+  misty.views <- misty.views %>% add_views(., create_view('mask', mask))
   
 }
 
@@ -116,5 +124,4 @@ misty.views <- misty.views %>% rename_view(., old.name = para.name, new.name = '
 if(exists("snakemake")){
   saveRDS(misty.views, snakemake@output[[1]])
 }
-
 

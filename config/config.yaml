@@ -37,6 +37,7 @@ misty:
             brain: {'trim': 1, 'cutoff': 1}
             heart: {'trim': 1, 'cutoff': 1}
     celltype:
+        cellprop_cutoff: 0.05
         bypass_intra: False
         plots:
             brain: {'trim': 1, 'cutoff': 1}
