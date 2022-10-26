@@ -127,7 +127,7 @@ rule plot_dif_interactions:
         unpack(dif_interactions_inputs)
     params:
         sign= 0.05,
-        lambda w: cellprop_cutoff = config['misty'][w.view_type].get('cellprop_cutoff')
+        cellprop_cutoff = lambda w: config['misty'][w.view_type].get('cellprop_cutoff')
     output: 
         'plots/Misty/{tissue}/{view_type}_diffplots.pdf'
     conda:
