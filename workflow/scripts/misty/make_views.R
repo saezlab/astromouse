@@ -97,7 +97,7 @@ cat('Using', as.character(2*radius), 'as l parameter in paraview creation\n')
 # make views --------------------------------------------------------------
 
 # TODO: redo this for all three views for this project
-if(view == 'functional'){
+if(view == 'functional' | view == 'pathwaysCT'){
   intra.view <- create_initial_view(datas[[2]])
   
   para.view <- create_initial_view(datas[[3]]) %>% add_paraview(datas[[1]] %>% select(x,y), l = radius * 2)
