@@ -98,11 +98,16 @@ extract_contrast_interactions <- function (misty.results.from, misty.results.to,
   return(interactions)
 }
 
-reformat_samples <- function(misty.results){
+reformat_samples <- function(misty.results, view){
   
   results <- lapply(misty.results, function(x){
     if('sample' %in% colnames(x)){
-      x$sample <- x$sample %>% dirname() %>% basename()
+      if(view == 'celltype'){
+        x$sample <- x$sample %>% dirname() %>% dirname() %>% basename()  
+      }else{
+        x$sample <- x$sample %>% dirname() %>% basename()  
+      }
+      
     }
     return(x)
   })
@@ -129,11 +134,11 @@ if(exists("snakemake")){
   
 }else{
   tissue <- 'brain'
-  model <- 'pathwaysCT'
+  model <- 'celltype'
   
   samples <- list.files(paste('data/original/ST/visium_data', tissue, sep = '_')) %>% sort()
   
-  result_folders <- paste0(paste('results/ST/Misty', tissue, sep = .Platform$file.sep), '/', samples, '/', view, '_misty_model')
+  result_folders <- paste0(paste('results/ST/Misty', tissue, sep = .Platform$file.sep), '/', samples, '/', model, '_misty_model')
   
   #files for testing in Rstudio
   metadata_fp <- paste('data/original/ST/metadata_visium_', tissue,'.csv', sep = '')
@@ -164,7 +169,17 @@ if(tissue == 'brain'){
   metadata$sample <- gsub('-', '_', metadata$sample)
 }
 
-results <- result_folders %>% collect_results() %>% reformat_samples()
+if(model == 'functional' | model == 'pathwaysCT'){
+  
+}else if (model == 'celltype'){
+
+  result_folders <- lapply(result_folders, function(folder){
+    list.dirs(folder, recursive = FALSE)
+  }) %>% unlist()
+  
+}
+
+results <- result_folders %>% collect_results() %>% reformat_samples(., view = model)
 
 
 # grouped results ---------------------------------------------------------
@@ -173,11 +188,15 @@ results <- result_folders %>% collect_results() %>% reformat_samples()
 grouped.results <- lapply(levels(metadata$condition), function(group){
   
   group.samples <- metadata %>% filter(condition == group)
-  keep <- which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
   
-  res <- result_folders[keep] %>% collect_results()
+  if(model == 'celltype'){
+    keep <- which(result_folders %>% dirname() %>% dirname() %>% basename() %in% group.samples$sample)
+  }else{
+    keep <- which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
+  }
+  group.results <- result_folders[keep] %>% collect_results()
   
-  res <- res %>% reformat_samples()
+  group.results <- group.results %>% reformat_samples(., view = model)
 })
 
 names(grouped.results) <- levels(metadata$condition)
