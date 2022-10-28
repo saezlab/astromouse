@@ -175,8 +175,8 @@ for key in interactions.keys():
                 
                 for (_, mouse), plot_column in zip(mice_to_plot.iterrows(), [1,3]):
                     idx = [plot_column if inter_to_plot.shape[0] == 1 else (index, plot_column)]
-                    sc.pl.spatial(acts[acts.obs.library_id == mouse['sample'], :], img_key='lowres', library_id=mouse['sample'],\
-                        color=mouse['Predictor'], size=1.5, legend_loc=None, show=False, ax=axs[idx[0]]) #vmin = (lims.loc[mouse['Predictor'], 'llim']*1.1),\vmax = (lims.loc[mouse['Predictor'], 'ulim']*1.1)
+                    sc.pl.spatial(acts[acts.obs.library_id == mouse['sample'], :], img_key=None, library_id=mouse['sample'],\
+                        color=mouse['Predictor'], size=1.5, na_color = '#A69F9F', legend_loc=None, show=False, ax=axs[idx[0]]) #vmin = (lims.loc[mouse['Predictor'], 'llim']*1.1),\vmax = (lims.loc[mouse['Predictor'], 'ulim']*1.1)
                     axs[idx[0]].set_title(mouse['mouse'] + ': ' + mouse['Predictor'])
                     axs[idx[0]].set_facecolor('#D9D9D9')
                     axs[idx[0]].set_ylabel('')
@@ -191,8 +191,8 @@ for key in interactions.keys():
                         temp = acts[acts.obs.library_id == mouse['sample'], :].copy()
 
                     idx = [plot_column  + 1 if inter_to_plot.shape[0] == 1 else (index, plot_column + 1)]
-                    sc.pl.spatial(temp, img_key='lowres', library_id=mouse['sample'],\
-                        color=mouse['Target'], size=1.5, legend_loc=None, show=False, ax=axs[idx[0]]) #vmin = (lims.loc[mouse['Target'], 'llim']*1.1),\vmax = (lims.loc[mouse['Target'], 'ulim']*1.1), 
+                    sc.pl.spatial(temp, img_key=None, library_id=mouse['sample'],\
+                        color=mouse['Target'], size=1.5, na_color = '#A69F9F', legend_loc=None, show=False, ax=axs[idx[0]]) #vmin = (lims.loc[mouse['Target'], 'llim']*1.1),\vmax = (lims.loc[mouse['Target'], 'ulim']*1.1), 
                     axs[idx[0]].set_title(mouse['mouse'] + ': ' + mouse['Target'])
                     axs[idx[0]].set_facecolor('#D9D9D9')
                     axs[idx[0]].set_ylabel('')
