@@ -174,8 +174,16 @@ for key in interactions.keys():
                 mice_to_plot = meta[meta['Interaction']  == row['inter']].sort_values('condition', ascending=False)
                 
                 for (_, mouse), plot_column in zip(mice_to_plot.iterrows(), [1,3]):
+                    if (view_type == 'celltype') or (view_type == 'pathwaysCT'):
+                        temp = acts.copy()
+                        temp.obsm['acts'] = temp.obsm['acts'].where(temp.obsm['acts'] >= cellprop_cutoff)
+                        temp = dc.get_acts(temp, 'acts')
+                        temp = temp[temp.obs.library_id == mouse['sample'], :]
+                    else:
+                        temp = acts[acts.obs.library_id == mouse['sample'], :].copy()
+
                     idx = [plot_column if inter_to_plot.shape[0] == 1 else (index, plot_column)]
-                    sc.pl.spatial(acts[acts.obs.library_id == mouse['sample'], :], img_key=None, library_id=mouse['sample'],\
+                    sc.pl.spatial(temp, img_key=None, library_id=mouse['sample'],\
                         color=mouse['Predictor'], size=1.5, na_color = '#A69F9F', legend_loc=None, show=False, ax=axs[idx[0]]) #vmin = (lims.loc[mouse['Predictor'], 'llim']*1.1),\vmax = (lims.loc[mouse['Predictor'], 'ulim']*1.1)
                     axs[idx[0]].set_title(mouse['mouse'] + ': ' + mouse['Predictor'])
                     axs[idx[0]].set_facecolor('#D9D9D9')

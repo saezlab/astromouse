@@ -36,7 +36,7 @@ rule get_celltype_views:
     output:
         view = 'results/ST/Misty/{tissue}/{sample}/celltype_view.rds'
     params:
-        cellprop_cutoff = config['misty']['celltype'].get('cellprop_cutoff', 0.05)
+        cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     conda:
         "../envs/misty.yml"
     script:
@@ -127,7 +127,7 @@ rule plot_dif_interactions:
         unpack(dif_interactions_inputs)
     params:
         sign= 0.05,
-        cellprop_cutoff = lambda w: config['misty'][w.view_type].get('cellprop_cutoff')
+        cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     output: 
         'plots/Misty/{tissue}/{view_type}_diffplots.pdf'
     conda:

@@ -59,7 +59,8 @@ rule ST_extract_deconv:
     output:
         csv = 'results/ST/ST_brain_deconvoluted.csv'
     params:
-        assay = config['deconvolution'].get("assay", 'hvg2000')
+        assay = config['deconvolution'].get("assay", 'hvg2000'),
+        cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     # resources:
     #     mem_mb=30000
     conda:

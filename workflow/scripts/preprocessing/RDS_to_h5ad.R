@@ -21,6 +21,7 @@ if(grepl(".h5ad$", output_fp, ignore.case = TRUE)){
   
   if(exists("snakemake")){
     assay <- as.character(snakemake@params$assay)
+    cellprop_cutoff = as.numeric(snakemake@params$cellprop_cutoff)
   }else{
     assay <- 'hvg2000'
   }
@@ -30,6 +31,7 @@ if(grepl(".h5ad$", output_fp, ignore.case = TRUE)){
   if(length(chosen) == 0) stop('The assay ', assay, ' does not exist in the Seurat object. Choose one of the following:\n', paste(names(data@assays), collapse = ' '))
   
   dec <- t(as.matrix(Seurat::GetAssayData(data, slot = 'data', assay = chosen)))
+  dec[dec < cellprop_cutoff] <- 0
   
   write.csv(dec, file = output_fp)
   
