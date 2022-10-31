@@ -125,7 +125,10 @@ for key in interactions.keys():
             inter_to_plot = current_inter[current_inter['group'] == current_pred].head(5).copy().reset_index()
             inter_to_plot['inter'] = inter_to_plot['view'] + '_' + inter_to_plot['Predictor'] + '_' + inter_to_plot['Target']
 
-            fig, axs = plt.subplots(inter_to_plot.shape[0], 5, figsize=(25, inter_to_plot.shape[0] * 5))
+            if 'intra' in inter_to_plot['view'].to_list()[0]:
+                fig, axs = plt.subplots(inter_to_plot.shape[0], 6, figsize=(30, inter_to_plot.shape[0] * 5))
+            else:
+                fig, axs = plt.subplots(inter_to_plot.shape[0], 5, figsize=(25, inter_to_plot.shape[0] * 5))
 
             mice = []
 
@@ -155,6 +158,35 @@ for key in interactions.keys():
                 else:
                     sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, ax = axs[idx[0]], order = ['Flight', 'Control'])
                 axs[idx[0]].set_title(row['Predictor'] + ' -> ' + row['Target'])
+
+                #compute correlations and plot
+                
+
+                if 'intra' in inter_to_plot['view'].to_list()[0]:
+                    df = acts.obsm['acts'].filter([row['Predictor'],row['Target']], axis = 1).copy()
+                    df = df[df[row['Target']] >= cellprop_cutoff]
+                    df[row['Predictor']] = df[row['Predictor']].where(df[row['Predictor']] >= cellprop_cutoff, 0)
+
+                    df = pd.merge(acts.obs.filter(['library_id','mouse', 'condition'], axis = 1), df, how = 'right', left_index=True, right_index=True)
+
+                    correlations = df.groupby(['library_id','mouse', 'condition'])[[row['Target'],row['Predictor']]].corr().unstack().iloc[:,1].to_frame()
+                    correlations.columns = ['_'.join(column) for column in correlations.columns.to_flat_index()]
+                    correlations.columns = ['Correlation']
+                    correlations = correlations.reset_index()
+
+                    idx = [5 if inter_to_plot.shape[0] == 1 else (index, 5)]
+                    sns.boxplot(x = "condition", y = "Importance", data = imp_to_plot, ax = axs[idx[0]],\
+                        color = 'lightgrey', fliersize = 0, order = ['Flight', 'Control'], width = 0.6)
+
+                    if tissue == 'brain':
+                        sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, hue = 'mouse', ax = axs[idx[0]], order = ['Flight', 'Control'])
+                    else:
+                        sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, ax = axs[idx[0]], order = ['Flight', 'Control'])
+                    axs[idx[0]].set_title(row['Predictor'] + ' -> ' + row['Target'])
+
+                
+
+
 
                 mice.append(flight_mouse)
                 mice.append(ground_mouse)
