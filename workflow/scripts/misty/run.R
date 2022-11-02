@@ -30,11 +30,11 @@ if(exists("snakemake")){
   
   bypass_intra <- FALSE
   
-  view_fp <- 'results/ST/Misty/brain/Sample_304_C1/pathwaysCT_view.rds'
+  view_fp <- 'results/ST/Misty/brain/Sample_158_C1/celltype_view.rds'
   cores <- 6
   output_dir <- "mistyTest"
   
-  view_type <- 'functional'
+  view_type <- 'celltype'
 }
 
 
@@ -65,8 +65,29 @@ if(view_type == 'celltype'){
     
     temp.views <- misty.views %>% filter_views(NA, view = 'mask', .data[[target]]) %>% remove_views('mask')
     
-    temp.views %>% run_misty(results.folder = paste(output_dir, target, sep = '/'), seed = rs, bypass.intra = bypass_intra, verbose = FALSE, target.subset = target)
+    views <- names(misty.views)[!grepl("misty.uniqueid|mask", names(misty.views))]
     
+    
+    names(temp.views[views]) %>% lapply(function(current.view){
+      
+      keep.columns <- temp.views[[current.view]]$data %>% summarise(across(where(is.numeric), var)) %>% t() %>% as.data.frame() %>% 
+        filter(V1 > 0) %>% row.names()
+      
+      cat(length(keep.columns), '\n')
+      
+      if(current.view == 'intraview'){
+        keep.columns <- unique(c(keep.columns, target))
+      }
+      
+      temp.views[[current.view]]$data <- temp.views[[current.view]]$data[keep.columns]
+      
+      print(ncol(temp.views[[current.view]]$data))
+      
+    })
+    
+    
+    
+    temp.views %>% run_misty(results.folder = paste(output_dir, target, sep = '/'), seed = rs, bypass.intra = bypass_intra, verbose = FALSE, target.subset = target)
   })
   
   
