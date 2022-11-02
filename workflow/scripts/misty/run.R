@@ -65,6 +65,8 @@ if(view_type == 'celltype'){
     
     temp.views <- misty.views %>% filter_views(NA, view = 'mask', .data[[target]]) %>% remove_views('mask')
     
+    if(temp.views$intraview$data %>% nrow() < 20) return()
+    
     views <- names(misty.views)[!grepl("misty.uniqueid|mask", names(misty.views))]
     
     
@@ -84,6 +86,8 @@ if(view_type == 'celltype'){
       return()
       
     })
+    
+    
     
     
     
