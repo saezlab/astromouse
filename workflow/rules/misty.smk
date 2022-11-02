@@ -105,11 +105,33 @@ rule get_dif_interactions:
     script:
         "../scripts/misty/get_differential_interactions.R"
 
+rule get_interaction_corr:
+    input:
+        interactions = 'results/Misty/{tissue}/{view_type}_diffInteractions.csv',
+        view = 'results/ST/Misty/{tissue}/{sample}/{view_type}_view.rds'
+    output:
+        corr = temp('results/ST/Misty/{tissue}/{sample}/Corr_{view_type}.csv')
+    params:
+        corr = 'pearson'
+    conda:
+        "../envs/misty.yml"
+    script:
+        "../scripts/misty/get_interactions_corr.R"
+
+rule combine_interaction_corr:
+    input:
+        lambda w: expand('results/ST/Misty/{{tissue}}/{sample}/Corr_{{view_type}}.csv', sample = config['samples'][w.tissue])
+    output:
+        corr = 'results/ST/Misty/{tissue}/{view_type}_Corr.csv'
+    shell:
+        "awk 'FNR==1 && NR!=1{{next;}}{{print}}' {input} >> {output}"
+
 
 def dif_interactions_inputs(wildcards):
     files = {'data': 'results/ST/{wildcards.tissue}_wImages.h5ad'.format(wildcards=wildcards),\
             'importances': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_importances.csv'.format(wildcards=wildcards),\
-            'diffInteractions': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_diffInteractions.csv'.format(wildcards=wildcards)\
+            'diffInteractions': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_diffInteractions.csv'.format(wildcards=wildcards),
+            'correlations': 'results/ST/Misty/{wildcards.tissue}/{wildcards.view_type}_Corr.csv'.format(wildcards=wildcards)\
             }
     if (wildcards.view_type == 'celltype' or wildcards.view_type == 'pathwaysCT'):
         files['cellprops'] = 'results/ST/ST_{wildcards.tissue}_deconvoluted.csv'.format(wildcards=wildcards)

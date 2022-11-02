@@ -22,6 +22,7 @@ if 'snakemake' in locals():
     pathways_fp = snakemake.input.get('pathways')
     TFs_fp = snakemake.input.get('GRNs')
     cellprop_fp = snakemake.input.get('cellprops')
+    corr_fp = snakemake.input.get('correlations')
 
     
     importances_fp = [snakemake.input.get('importances')]
@@ -42,6 +43,7 @@ else:
     pathways_fp = 'results/ST/functional/{0}_activities_pathways.csv'.format(tissue)
     TFs_fp = 'results/ST/functional/{0}_activities_TFs.csv'.format(tissue)
     cellprop_fp = 'results/ST/ST_{0}_deconvoluted.csv'.format(tissue)
+    corr_fp = 'results/ST/Misty/{0}/{1}_Corr.csv'.format(tissue, view_type)
 
     interactions_fp = interactions_fp[0:1]
     importances_fp = importances_fp[0:1]
@@ -53,6 +55,10 @@ else:
 
 functional_fps = [pathways_fp, TFs_fp, cellprop_fp]
 functional_fps = [f for f in functional_fps if f is not None]
+
+correlations = pd.read_csv(corr_fp, index_col=0, sep=',')
+correlations['Interaction'] = correlations[['view', 'Predictor', 'Target']].agg('_'.join, axis=1)
+correlations = correlations.filter(['sample', 'corr', 'Interaction']).rename({'corr': 'Correlation'}, axis = 1)
 
 
 # %%
@@ -117,6 +123,7 @@ for key in interactions.keys():
         current_inter = current_inter.sort_values('group', axis = 0)
 
         current_imp = importances[key].copy()
+        current_imp = pd.merge(current_imp, correlations, how='left', on = ['sample', 'Interaction'])
 
         # select predictors to plot together
         ordered_predictors = current_inter.groupby(['view','group']).agg({'p.adj' : min}).sort_values(['view', 'p.adj']).reset_index().groupby('view').head(5)['group'].to_list()
@@ -125,10 +132,7 @@ for key in interactions.keys():
             inter_to_plot = current_inter[current_inter['group'] == current_pred].head(5).copy().reset_index()
             inter_to_plot['inter'] = inter_to_plot['view'] + '_' + inter_to_plot['Predictor'] + '_' + inter_to_plot['Target']
 
-            if 'intra' in inter_to_plot['view'].to_list()[0]:
-                fig, axs = plt.subplots(inter_to_plot.shape[0], 6, figsize=(30, inter_to_plot.shape[0] * 5))
-            else:
-                fig, axs = plt.subplots(inter_to_plot.shape[0], 5, figsize=(25, inter_to_plot.shape[0] * 5))
+            fig, axs = plt.subplots(inter_to_plot.shape[0], 6, figsize=(25, inter_to_plot.shape[0] * 5))
 
             mice = []
 
@@ -159,30 +163,16 @@ for key in interactions.keys():
                     sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, ax = axs[idx[0]], order = ['Flight', 'Control'])
                 axs[idx[0]].set_title(row['Predictor'] + ' -> ' + row['Target'])
 
-                #compute correlations and plot
-                
+                #plot correlations
+                idx = [5 if inter_to_plot.shape[0] == 1 else (index, 5)]
+                sns.boxplot(x = "condition", y = "Correlation", data = imp_to_plot, ax = axs[idx[0]],\
+                    color = 'lightgrey', fliersize = 0, order = ['Flight', 'Control'], width = 0.6)
 
-                if 'intra' in inter_to_plot['view'].to_list()[0]:
-                    df = acts.obsm['acts'].filter([row['Predictor'],row['Target']], axis = 1).copy()
-                    df = df[df[row['Target']] >= cellprop_cutoff]
-                    df[row['Predictor']] = df[row['Predictor']].where(df[row['Predictor']] >= cellprop_cutoff, 0)
-
-                    df = pd.merge(acts.obs.filter(['library_id','mouse', 'condition'], axis = 1), df, how = 'right', left_index=True, right_index=True)
-
-                    correlations = df.groupby(['library_id','mouse', 'condition'])[[row['Target'],row['Predictor']]].corr().unstack().iloc[:,1].to_frame()
-                    correlations.columns = ['_'.join(column) for column in correlations.columns.to_flat_index()]
-                    correlations.columns = ['Correlation']
-                    correlations = correlations.reset_index()
-
-                    idx = [5 if inter_to_plot.shape[0] == 1 else (index, 5)]
-                    sns.boxplot(x = "condition", y = "Correlation", data = correlations, ax = axs[idx[0]],\
-                        color = 'lightgrey', fliersize = 0, order = ['Flight', 'Control'], width = 0.6)
-
-                    if tissue == 'brain':
-                        sns.stripplot(x = "condition", y = "Correlation", data = correlations, hue = 'mouse', ax = axs[idx[0]], order = ['Flight', 'Control'])
-                    else:
-                        sns.stripplot(x = "condition", y = "Importance", data = correlations, ax = axs[idx[0]], order = ['Flight', 'Control'])
-                    axs[idx[0]].set_title(row['Predictor'] + ' -> ' + row['Target'])
+                if tissue == 'brain':
+                    sns.stripplot(x = "condition", y = "Correlation", data = imp_to_plot, hue = 'mouse', ax = axs[idx[0]], order = ['Flight', 'Control'])
+                else:
+                    sns.stripplot(x = "condition", y = "Correlation", data = imp_to_plot, ax = axs[idx[0]], order = ['Flight', 'Control'])
+                axs[idx[0]].set_title(row['Predictor'] + ' -> ' + row['Target'])
 
                 mice.append(flight_mouse)
                 mice.append(ground_mouse)
