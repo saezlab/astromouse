@@ -30,11 +30,11 @@ if(exists("snakemake")){
   
   bypass_intra <- FALSE
   
-  view_fp <- 'data/working/ST/Misty/brain/Sample_304_C1/functional_view.rds'
+  view_fp <- 'results/ST/Misty/brain/Sample_304_C1/pathwaysCT_view.rds'
   cores <- 6
   output_dir <- "mistyTest"
   
-  view_type <- snakemake@wildcards$view_type
+  view_type <- 'functional'
 }
 
 
