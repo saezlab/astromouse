@@ -79,9 +79,9 @@ if(view_type == 'celltype'){
         keep.columns <- unique(c(keep.columns, target))
       }
       
-      temp.views[[current.view]]$data <- temp.views[[current.view]]$data[keep.columns]
+      temp.views[[current.view]]$data <<- temp.views[[current.view]]$data[keep.columns]
       
-      print(ncol(temp.views[[current.view]]$data))
+      return()
       
     })
     
