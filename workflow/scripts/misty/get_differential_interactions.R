@@ -42,19 +42,19 @@ extract_contrast_interactions <- function (misty.results.from, misty.results.to,
   }
   
   #check that both collections contain exactly the same target-predictor interactions in each view
-  assertthat::assert_that(all(views %>% purrr::map_lgl(function(current.view) {
-    
-    rlang::is_empty(setdiff(misty.results.from$importances.aggregated %>% dplyr::filter(.data$view == current.view) %>%
-                              dplyr::pull(.data$Predictor) %>% unique(),
-                            misty.results.to$importances.aggregated %>% dplyr::filter(.data$view == current.view) %>%
-                              dplyr::pull(.data$Predictor) %>% unique())) &
-      
-      rlang::is_empty(setdiff(misty.results.from$importances.aggregated %>% dplyr::filter(.data$view == current.view) %>%
-                                dplyr::pull(.data$Target) %>% unique(),
-                              misty.results.to$importances.aggregated %>% dplyr::filter(.data$view == current.view) %>%
-                                dplyr::pull(.data$Target) %>% unique()))
-    
-  })), msg = "Incompatible predictors and targets.")
+  # assertthat::assert_that(all(views %>% purrr::map_lgl(function(current.view) {
+  #   
+  #   rlang::is_empty(setdiff(misty.results.from$importances.aggregated %>% dplyr::filter(.data$view == current.view) %>%
+  #                             dplyr::pull(.data$Predictor) %>% unique(),
+  #                           misty.results.to$importances.aggregated %>% dplyr::filter(.data$view == current.view) %>%
+  #                             dplyr::pull(.data$Predictor) %>% unique())) &
+  #     
+  #     rlang::is_empty(setdiff(misty.results.from$importances.aggregated %>% dplyr::filter(.data$view == current.view) %>%
+  #                               dplyr::pull(.data$Target) %>% unique(),
+  #                             misty.results.to$importances.aggregated %>% dplyr::filter(.data$view == current.view) %>%
+  #                               dplyr::pull(.data$Target) %>% unique()))
+  #   
+  # })), msg = "Incompatible predictors and targets.")
   
   
   inv <- sign((stringr::str_detect(trim.measure.type, "gain") |
@@ -74,7 +74,7 @@ extract_contrast_interactions <- function (misty.results.from, misty.results.to,
     
     
     
-    mask <- ((from.view.wide %>% dplyr::select(-.data$Predictor)) < cutoff.from) & ((to.view.wide %>% dplyr::select(-.data$Predictor)) >= cutoff.to)
+    mask <- ((from.view.wide %>% dplyr::select(colnames(to.view.wide)) %>% dplyr::select(-.data$Predictor)) < cutoff.from) & ((to.view.wide %>% dplyr::select(-.data$Predictor)) >= cutoff.to)
     
     
     if(sum(mask, na.rm = TRUE) > 0){ 
