@@ -37,7 +37,7 @@ if(exists("snakemake")){
   celltype_fp <- normalizePath(paste('results/ST/ST_', tissue, '_deconvoluted.csv', sep=""))
   pathways_fp <- normalizePath(paste('results/ST/functional/', tissue, '_activities_pathways.csv', sep=""))
   tf_fp <- normalizePath(paste('results/ST/functional/', tissue, '_activities_TFs.csv', sep=""))
-  sample <- "Sample_304_C1"
+  sample <- "Sample_158_B1"
   
   output_fp <- paste('results/ST/Misty/', tissue,'/', sample, '/celltype_view.rds', sep = '')
   
@@ -70,7 +70,7 @@ datas[2:length(datas)] <- lapply(datas[2:length(datas)], function(data){
   data <- data[rownames(datas[[1]]),]
 })
 
-if(nrow(datas[[1]]) < 1) stop('There are no spots for sample ', sample, ' in the provided coordinates file:\n', coord_fp)
+if(nrow(datas[[1]]) < 1) stop('There are no spots for sample ', sample, ' in the provided coordinates file:\n', datas_fp[[1]])
 
 
 # determine distance between spots ----------------------------------------
