@@ -33,7 +33,7 @@ if(grepl(".h5ad$", output_fp, ignore.case = TRUE)){
   dec <- t(as.matrix(Seurat::GetAssayData(data, slot = 'data', assay = chosen)))
   
   dec[dec < cellprop_cutoff] <- 0
-  dec <- compositions::acomp(dec)
+  dec <- as.data.frame(compositions::acomp(dec))
   
   write.csv(dec, file = output_fp)
   
