@@ -55,7 +55,7 @@ output <- targets %>%   map_dfr(function(target){
   
   current.inter <- interactions %>% filter(.data$Target == target)
   
-  if(view_type == 'celltype' | view == 'CTpathways'){
+  if(view_type == 'celltype' | view_type == 'CTpathways'){
     temp.views <- misty.views %>% filter_views(NA, view = 'mask', .data[[target]]) %>% remove_views('mask') 
   }else{
     temp.views <- misty.views
