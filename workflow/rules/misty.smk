@@ -23,7 +23,7 @@ rule get_func_views:
     params:
         skip = 'intra'
     output:
-        view = 'results/ST/Misty/{tissue}/functional/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/functional/s~{sample}_view.rds'
     conda:
         "../envs/misty.yml"
     script:
@@ -34,7 +34,7 @@ rule get_celltype_views:
         'results/ST/Misty/{tissue}_coordinates.csv',
         'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
-        view = 'results/ST/Misty/{tissue}/celltype/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/celltype/s~{sample}_view.rds'
     params:
         cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     conda:
@@ -48,7 +48,7 @@ rule get_patwayCT_views:
         'results/ST/functional/{tissue}_activities_pathways.csv',
         'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
-        view = 'results/ST/Misty/{tissue}/pathwaysCT/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/pathwaysCT/s~{sample}_view.rds'
     conda:
         "../envs/misty.yml"
     script:
@@ -56,7 +56,7 @@ rule get_patwayCT_views:
 
 rule run_views:
     input:
-        view = 'results/ST/Misty/{tissue}/{view_type}/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/{view_type}/s~{sample}_view.rds'
     output: 
         directory('results/ST/Misty/{tissue}/{view_type}/{sample}')
     params:
