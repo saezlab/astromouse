@@ -23,7 +23,7 @@ rule get_func_views:
     params:
         skip = 'intra'
     output:
-        view = 'results/ST/Misty/{tissue}/functional/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/functional/views/{sample}_view.rds'
     conda:
         "../envs/misty.yml"
     script:
@@ -34,7 +34,7 @@ rule get_celltype_views:
         'results/ST/Misty/{tissue}_coordinates.csv',
         'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
-        view = 'results/ST/Misty/{tissue}/celltype/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/celltype/views/{sample}_view.rds'
     params:
         cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     conda:
@@ -42,13 +42,27 @@ rule get_celltype_views:
     script:
         "../scripts/misty/make_views.R"
 
-rule get_patwayCT_views:
+rule get_pathwaysCT_views:
     input:
         'results/ST/Misty/{tissue}_coordinates.csv',
         'results/ST/functional/{tissue}_activities_pathways.csv',
         'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
-        view = 'results/ST/Misty/{tissue}/pathwaysCT/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/pathwaysCT/views/{sample}_view.rds'
+    conda:
+        "../envs/misty.yml"
+    script:
+        "../scripts/misty/make_views.R"
+
+rule get_CTpathways_views:
+    input:
+        'results/ST/Misty/{tissue}_coordinates.csv',
+        'results/ST/ST_{tissue}_deconvoluted.csv',
+        'results/ST/functional/{tissue}_activities_pathways.csv',
+    params:
+        cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
+    output:
+        view = 'results/ST/Misty/{tissue}/CTpathways/views/{sample}_view.rds'
     conda:
         "../envs/misty.yml"
     script:
@@ -56,7 +70,7 @@ rule get_patwayCT_views:
 
 rule run_views:
     input:
-        view = 'results/ST/Misty/{tissue}/{view_type}/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/{view_type}/views/{sample}_view.rds'
     output: 
         directory('results/ST/Misty/{tissue}/{view_type}/models/{sample}')
     params:
@@ -108,9 +122,9 @@ rule get_dif_interactions:
 rule get_interaction_corr:
     input:
         interactions = 'results/Misty/{tissue}/{view_type}_diffInteractions.csv',
-        view = 'results/ST/Misty/{tissue}/{view_type}/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/{view_type}/views/{sample}_view.rds'
     output:
-        corr = temp('results/Misty/{tissue}/{view_type}/{sample}_Corr.csv')
+        corr = temp('results/ST/Misty/{tissue}/{view_type}/correlations/{sample}_Corr.csv')
     params:
         corr = 'pearson'
     conda:
@@ -120,7 +134,7 @@ rule get_interaction_corr:
 
 rule combine_interaction_corr:
     input:
-        lambda w: expand('results/Misty/{{tissue}}/{{view_type}}/{sample}_Corr.csv', sample = config['samples'][w.tissue])
+        lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/correlations/{sample}_Corr.csv', sample = config['samples'][w.tissue])
     output:
         corr = 'results/Misty/{tissue}/{view_type}_Corr.csv'
     shell:
