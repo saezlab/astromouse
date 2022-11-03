@@ -59,7 +59,7 @@ lapply(names(misty.views), function(view){
 
 cat("DEBUG: started running misty with seed", rs,"\nbypass.intra set to:", bypass_intra, "\noutput dir is:", output_dir, "\n")
 
-if(view_type == 'celltype'){
+if(view_type == 'celltype' | view_type == 'CTpathways'){
   
   lapply(colnames(misty.views$intraview$data), function(target){
     
@@ -86,9 +86,6 @@ if(view_type == 'celltype'){
       return()
       
     })
-    
-    
-    
     
     
     temp.views %>% run_misty(results.folder = paste(output_dir, target, sep = '/'), seed = rs, bypass.intra = bypass_intra, verbose = FALSE, target.subset = target)

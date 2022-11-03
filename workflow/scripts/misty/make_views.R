@@ -28,10 +28,15 @@ if(exists("snakemake")){
   
   sample <- snakemake@wildcards$sample
   
+  if('cellprop_cutoff' %in% names(snakemake@params)){
+    cellprop_cutoff <- snakemake@params$cellprop_cutoff
+  }
+  
   output_fp <- snakemake@output[[1]]
   
 }else{
   tissue <- 'brain'
+  view_type <- 'CTpathways'
   
   coord_fp <- normalizePath(paste('results/ST/Misty/', tissue, '_coordinates.csv', sep=""))
   celltype_fp <- normalizePath(paste('results/ST/ST_', tissue, '_deconvoluted.csv', sep=""))
@@ -39,16 +44,19 @@ if(exists("snakemake")){
   tf_fp <- normalizePath(paste('results/ST/functional/', tissue, '_activities_TFs.csv', sep=""))
   sample <- "Sample_159_B1"
   
-  output_fp <- paste('results/ST/Misty/', tissue,'/celltype/', sample,'_view.rds', sep = '')
+  output_fp <- paste('results/ST/Misty/', tissue,'/', view_type, '/views/', sample,'_view.rds', sep = '')
+  
+  cellprop_cutoff <- 0.05
   
   datas_fp <- list(coord = coord_fp, cellprop = celltype_fp)
+  datas_fp <- list(coord = coord_fp, cellprop = celltype_fp, pathways = pathways_fp)
   
 }
 
 
 # determine view type -----------------------------------------------------
 
-view <- dirname(output_fp) %>% basename()
+view <- output_fp %>% dirname() %>% dirname() %>% basename()
 
 
 
@@ -97,7 +105,7 @@ cat('Using', as.character(2*radius), 'as l parameter in paraview creation\n')
 # make views --------------------------------------------------------------
 
 # TODO: redo this for all three views for this project
-if(view == 'functional' | view == 'pathwaysCT'){
+if(view == 'functional' | view == 'pathwaysCT' | view == 'CTpathways'){
   intra.view <- create_initial_view(datas[[2]])
   
   para.view <- create_initial_view(datas[[3]]) %>% add_paraview(datas[[1]] %>% select(x,y), l = radius * 2)
@@ -106,11 +114,15 @@ if(view == 'functional' | view == 'pathwaysCT'){
   
   misty.views <- intra.view %>% add_views(new.views = para.view)
   
-}else if (view == 'celltype'){
+}
+
+if (view == 'celltype'| view == 'CTpathways'){
   
-  misty.views <- create_initial_view(datas[[2]]) %>% add_paraview(datas[[1]] %>% select(x,y), l = radius * 2)
+  if (view == 'celltype'){
+    misty.views <- create_initial_view(datas[[2]]) %>% add_paraview(datas[[1]] %>% select(x,y), l = radius * 2)
+  }
   
-  mask <- misty.views$intraview$data %>% transmute_all(function(x){x > 0.05})
+  mask <- misty.views$intraview$data %>% transmute_all(function(x){x >= cellprop_cutoff})
   
   misty.views <- misty.views %>% add_views(., create_view('mask', mask))
   
