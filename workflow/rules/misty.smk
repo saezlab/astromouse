@@ -147,10 +147,10 @@ def dif_interactions_inputs(wildcards):
             'diffInteractions': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_diffInteractions.csv'.format(wildcards=wildcards),
             'correlations': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_Corr.csv'.format(wildcards=wildcards)\
             }
-    if (wildcards.view_type == 'celltype' or wildcards.view_type == 'pathwaysCT'):
+    if (wildcards.view_type in ['celltype', 'pathwaysCT', 'CTpathways']):
         files['cellprops'] = 'results/ST/ST_{wildcards.tissue}_deconvoluted.csv'.format(wildcards=wildcards)
 
-    if (wildcards.view_type == 'functional' or wildcards.view_type == 'pathwaysCT'):
+    if (wildcards.view_type in ['functional', 'pathwaysCT', 'CTpathways']):
         files['pathways'] = 'results/ST/functional/{wildcards.tissue}_activities_pathways.csv'.format(wildcards=wildcards)
 
     if (wildcards.view_type == 'functional'):
