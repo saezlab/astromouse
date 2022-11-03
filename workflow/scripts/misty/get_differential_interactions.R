@@ -171,7 +171,7 @@ if(tissue == 'brain'){
 
 if(model == 'functional' | model == 'pathwaysCT'){
   
-}else if (model == 'celltype' | view == 'CTpathways'){
+}else if (model == 'celltype' | model == 'CTpathways'){
 
   result_folders <- lapply(result_folders, function(folder){
     list.dirs(folder, recursive = FALSE)
