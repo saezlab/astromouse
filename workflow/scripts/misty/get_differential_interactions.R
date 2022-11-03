@@ -103,9 +103,9 @@ reformat_samples <- function(misty.results, view){
   results <- lapply(misty.results, function(x){
     if('sample' %in% colnames(x)){
       if(view == 'celltype'){
-        x$sample <- x$sample %>% dirname() %>% dirname() %>% basename()  
-      }else{
         x$sample <- x$sample %>% dirname() %>% basename()  
+      }else{
+        x$sample <- x$sample %>% basename()  
       }
       
     }
@@ -190,9 +190,9 @@ grouped.results <- lapply(levels(metadata$condition), function(group){
   group.samples <- metadata %>% filter(condition == group)
   
   if(model == 'celltype'){
-    keep <- which(result_folders %>% dirname() %>% dirname() %>% basename() %in% group.samples$sample)
-  }else{
     keep <- which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
+  }else{
+    keep <- which(result_folders %>% basename() %in% group.samples$sample)
   }
   group.results <- result_folders[keep] %>% collect_results()
   

@@ -23,7 +23,7 @@ rule get_func_views:
     params:
         skip = 'intra'
     output:
-        view = 'results/ST/Misty/{tissue}/{sample}/functional_view.rds'
+        view = 'results/ST/Misty/{tissue}/functional/{sample}_view.rds'
     conda:
         "../envs/misty.yml"
     script:
@@ -34,7 +34,7 @@ rule get_celltype_views:
         'results/ST/Misty/{tissue}_coordinates.csv',
         'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
-        view = 'results/ST/Misty/{tissue}/{sample}/celltype_view.rds'
+        view = 'results/ST/Misty/{tissue}/celltype/{sample}_view.rds'
     params:
         cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     conda:
@@ -48,7 +48,7 @@ rule get_patwayCT_views:
         'results/ST/functional/{tissue}_activities_pathways.csv',
         'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
-        view = 'results/ST/Misty/{tissue}/{sample}/pathwaysCT_view.rds'
+        view = 'results/ST/Misty/{tissue}/pathwaysCT/{sample}_view.rds'
     conda:
         "../envs/misty.yml"
     script:
@@ -56,9 +56,9 @@ rule get_patwayCT_views:
 
 rule run_views:
     input:
-        view = 'results/ST/Misty/{tissue}/{sample}/{view_type}_view.rds'
+        view = 'results/ST/Misty/{tissue}/{view_type}/{sample}_view.rds'
     output: 
-        directory('results/ST/Misty/{tissue}/{sample}/{view_type}_misty_model')
+        directory('results/ST/Misty/{tissue}/{view_type}/{sample}')
     params:
         seed = config['misty'].get("random_seed", 42),
         bypass_intra = lambda wildcards: config['misty'][wildcards.view_type].get('bypass_intra', False)
@@ -75,7 +75,7 @@ rule run_views:
 rule plot_misty_results:
     input:
         'data/original/ST/metadata_visium_{tissue}.csv',
-        lambda w: expand('results/ST/Misty/{{tissue}}/{sample}/{{view_type}}_misty_model', sample = config['samples'][w.tissue])
+        lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/{sample}', sample = config['samples'][w.tissue])
     output: 
         'plots/Misty/{tissue}/{view_type}_misty.pdf',
         'plots/Misty/{tissue}/{view_type}_misty_Flight.pdf',
@@ -96,7 +96,7 @@ rule plot_misty_results:
 rule get_dif_interactions:
     input:
         'data/original/ST/metadata_visium_{tissue}.csv',
-        lambda w: expand('results/ST/Misty/{{tissue}}/{sample}/{{view_type}}_misty_model', sample = config['samples'][w.tissue])
+        lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/{sample}', sample = config['samples'][w.tissue])
     output: 
         'results/Misty/{tissue}/{view_type}_importances.csv',
         'results/Misty/{tissue}/{view_type}_diffInteractions.csv'
@@ -108,9 +108,9 @@ rule get_dif_interactions:
 rule get_interaction_corr:
     input:
         interactions = 'results/Misty/{tissue}/{view_type}_diffInteractions.csv',
-        view = 'results/ST/Misty/{tissue}/{sample}/{view_type}_view.rds'
+        view = 'results/ST/Misty/{tissue}/{view_type}/{sample}_view.rds'
     output:
-        corr = temp('results/ST/Misty/{tissue}/{sample}/Corr_{view_type}.csv')
+        corr = temp('results/Misty/{tissue}/{view_type}/{sample}_Corr.csv')
     params:
         corr = 'pearson'
     conda:
@@ -120,9 +120,9 @@ rule get_interaction_corr:
 
 rule combine_interaction_corr:
     input:
-        lambda w: expand('results/ST/Misty/{{tissue}}/{sample}/Corr_{{view_type}}.csv', sample = config['samples'][w.tissue])
+        lambda w: expand('results/Misty/{{tissue}}/{{view_type}}/{sample}_Corr.csv', sample = config['samples'][w.tissue])
     output:
-        corr = 'results/ST/Misty/{tissue}/{view_type}_Corr.csv'
+        corr = 'results/Misty/{tissue}/{view_type}_Corr.csv'
     shell:
         "awk 'FNR==1 && NR!=1{{next;}}{{print}}' {input} >> {output}"
 
@@ -131,7 +131,7 @@ def dif_interactions_inputs(wildcards):
     files = {'data': 'results/ST/{wildcards.tissue}_wImages.h5ad'.format(wildcards=wildcards),\
             'importances': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_importances.csv'.format(wildcards=wildcards),\
             'diffInteractions': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_diffInteractions.csv'.format(wildcards=wildcards),
-            'correlations': 'results/ST/Misty/{wildcards.tissue}/{wildcards.view_type}_Corr.csv'.format(wildcards=wildcards)\
+            'correlations': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_Corr.csv'.format(wildcards=wildcards)\
             }
     if (wildcards.view_type == 'celltype' or wildcards.view_type == 'pathwaysCT'):
         files['cellprops'] = 'results/ST/ST_{wildcards.tissue}_deconvoluted.csv'.format(wildcards=wildcards)
