@@ -189,7 +189,7 @@ grouped.results <- lapply(levels(metadata$condition), function(group){
   
   group.samples <- metadata %>% filter(condition == group)
   
-  if(model == 'celltype' | view == 'CTpathways'){
+  if(model == 'celltype' | model == 'CTpathways'){
     keep <- which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
   }else{
     keep <- which(result_folders %>% basename() %in% group.samples$sample)
