@@ -58,7 +58,7 @@ rule run_views:
     input:
         view = 'results/ST/Misty/{tissue}/{view_type}/{sample}_view.rds'
     output: 
-        directory('results/ST/Misty/{tissue}/{view_type}/{sample}')
+        directory('results/ST/Misty/{tissue}/{view_type}/models/{sample}')
     params:
         seed = config['misty'].get("random_seed", 42),
         bypass_intra = lambda wildcards: config['misty'][wildcards.view_type].get('bypass_intra', False)
@@ -75,7 +75,7 @@ rule run_views:
 rule plot_misty_results:
     input:
         'data/original/ST/metadata_visium_{tissue}.csv',
-        lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/{sample}', sample = config['samples'][w.tissue])
+        lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/models/{sample}', sample = config['samples'][w.tissue])
     output: 
         'plots/Misty/{tissue}/{view_type}_misty.pdf',
         'plots/Misty/{tissue}/{view_type}_misty_Flight.pdf',
@@ -96,7 +96,7 @@ rule plot_misty_results:
 rule get_dif_interactions:
     input:
         'data/original/ST/metadata_visium_{tissue}.csv',
-        lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/{sample}', sample = config['samples'][w.tissue])
+        lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/models/{sample}', sample = config['samples'][w.tissue])
     output: 
         'results/Misty/{tissue}/{view_type}_importances.csv',
         'results/Misty/{tissue}/{view_type}_diffInteractions.csv'
