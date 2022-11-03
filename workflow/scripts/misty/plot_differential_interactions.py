@@ -162,9 +162,15 @@ for key in interactions.keys():
                     color = 'lightgrey', fliersize = 0, order = ['Flight', 'Control'], width = 0.6)
 
                 x1, x2 = 0, 1
-                y, h, col = imp_to_plot["Importance"].max() * (1.1), imp_to_plot["Importance"].max() * (0.3), 'k'
+                y, h, col = imp_to_plot["Importance"].max() * (1.1), imp_to_plot["Importance"].max() * (0.1), 'k'
                 axs[idx[0]].plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
-                axs[idx[0]].text((x1+x2)*.5, y+h, '{:.2e}'.format(row['p.adj']), ha='center', va='bottom', color=col)
+
+                pval_text = '{:.2e}'.format(row['p.adj'])
+                if row['p.adj'] > significance_threshold: 
+                    pval_text = 'ns = ' + pval_text
+                else: 
+                    pval_text = 'sig = ' + pval_text
+                axs[idx[0]].text((x1+x2)*.5, y+h, pval_text, ha='center', va='bottom', color=col)
 
                 if tissue == 'brain':
                     sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, hue = 'mouse', ax = axs[idx[0]], order = ['Flight', 'Control'])

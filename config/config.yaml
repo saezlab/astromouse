@@ -15,7 +15,7 @@ samples:
 
 deconvolution:
     assay: 'hvg2000'
-    cellprop_cutoff: 0.1
+    cellprop_cutoff: 0.05
 
 functional:
     TFs: {'normalisation': 'log1p', 'method': 'mlm', levels: 'ABC'}

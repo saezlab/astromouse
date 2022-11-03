@@ -8,6 +8,7 @@ dependencies:
   - r-devtools
   - r-tidyverse
   - r-seurat
+  - r-compositions
   - bioconductor-singlecellexperiment 
   - bioconductor-zellkonverter
   - r-seuratobject
