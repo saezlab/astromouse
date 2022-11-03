@@ -26,7 +26,7 @@ if(exists("snakemake")){
     stop('The input has to contain either 2 or 3 files, corresponding (in order) to coordinates, and then either intra+para data (in 1 file), or intra and paraview (2 files). ', length(datas_fp), ' files were given:\n', paste(datas_fp, collapse = ' '))
   }
   
-  sample <- basename(dirname(snakemake@output[[1]]))
+  sample <- snakemake@wildcards$sample
   
   output_fp <- snakemake@output[[1]]
   
