@@ -108,7 +108,7 @@ rule get_dif_interactions:
 rule get_interaction_corr:
     input:
         interactions = 'results/Misty/{tissue}/{view_type}_diffInteractions.csv',
-        view = 'results/ST/Misty/{tissue}/{view_type}/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/{view_type}/s~{sample}_view.rds'
     output:
         corr = temp('results/Misty/{tissue}/{view_type}/{sample}_Corr.csv')
     params:
