@@ -37,9 +37,9 @@ if(exists("snakemake")){
   celltype_fp <- normalizePath(paste('results/ST/ST_', tissue, '_deconvoluted.csv', sep=""))
   pathways_fp <- normalizePath(paste('results/ST/functional/', tissue, '_activities_pathways.csv', sep=""))
   tf_fp <- normalizePath(paste('results/ST/functional/', tissue, '_activities_TFs.csv', sep=""))
-  sample <- "Sample_158_B1"
+  sample <- "Sample_159_B1"
   
-  output_fp <- paste('results/ST/Misty/', tissue,'/', sample, '/celltype_view.rds', sep = '')
+  output_fp <- paste('results/ST/Misty/', tissue,'/celltype/', sample,'_view.rds', sep = '')
   
   datas_fp <- list(coord = coord_fp, cellprop = celltype_fp)
   
@@ -48,7 +48,7 @@ if(exists("snakemake")){
 
 # determine view type -----------------------------------------------------
 
-view <- gsub('_view.rds','', basename(output_fp))
+view <- dirname(output_fp) %>% basename()
 
 
 
