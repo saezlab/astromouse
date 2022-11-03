@@ -95,7 +95,10 @@ df = pd.concat(df, join='outer', axis=0)
 mask = pd.DataFrame({'target':[ (target in activities.columns) for target in df['Target'] ],\
     'pred': [ (predictor in activities.columns) for predictor in df['Predictor'] ],\
     'sig': (df['p.adj'] <= significance_threshold)})
-df = df[mask.all(axis= 'columns')]
+if mask['sig'].sum() == 0:
+    df = df.sort_values('p.adj')[mask.filter(['target', 'pred']).all(axis='columns')].head(5).reset_index(drop=True)
+else:
+    df = df[mask.all(axis= 'columns')]
 print('Significant interactions: ', df.shape[0])
 
 # %%
