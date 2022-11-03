@@ -96,6 +96,7 @@ mask = pd.DataFrame({'target':[ (target in activities.columns) for target in df[
     'pred': [ (predictor in activities.columns) for predictor in df['Predictor'] ],\
     'sig': (df['p.adj'] <= significance_threshold)})
 df = df[mask.all(axis= 'columns')]
+print('Significant interactions: ', df.shape[0])
 
 # %%
 interactions = {}
