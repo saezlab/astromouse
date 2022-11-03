@@ -101,7 +101,7 @@ reformat_samples <- function(misty.results, view){
   
   results <- lapply(misty.results, function(x){
     if('sample' %in% colnames(x)){
-      if(view == 'celltype'){
+      if(view == 'celltype' | view == 'CTpathways'){
         x$sample <- x$sample %>% dirname() %>% basename()  
       }else{
         x$sample <- x$sample %>% basename()  
@@ -167,13 +167,19 @@ if(tissue == 'brain'){
   metadata$sample <- gsub('-', '_', metadata$sample)
 }
 
-if(view == 'functional' | view == 'pathwaysCT'){
+if(view == 'functional' | view == 'pathwaysCT' | view == 'CTpathways'){
   intra_name <- 'intra_act'
   cleaning <- TRUE
   
-}else if (view == 'celltype'){
+}
+
+if(view == 'celltype'){
   intra_name <- 'intra'
   cleaning <- FALSE
+  
+}
+
+if (view == 'celltype' | view == 'CTpathways'){
   
   result_folders <- lapply(result_folders, function(folder){
     list.dirs(folder, recursive = FALSE)
@@ -242,7 +248,7 @@ grouped.results <- lapply(levels(metadata$condition), function(group){
   
   group.samples <- metadata %>% filter(condition == group)
   
-  if(view == 'celltype'){
+  if(view == 'celltype' | view == 'CTpathways'){
     keep <- which(result_folders %>% dirname() %>% basename() %in% group.samples$sample)
   }else{
     keep <- which(result_folders %>% basename() %in% group.samples$sample)

@@ -223,7 +223,7 @@ for key in interactions.keys():
                     axs[idx[0]].set_ylabel('')
                     axs[idx[0]].set_xlabel('')
 
-                    if view_type == 'celltype':
+                    if (view_type == 'celltype') or (view_type == 'CTpathways'):
                         temp = acts.copy()
                         temp.obsm['acts'] = temp.obsm['acts'].where(temp.obsm['acts'] >= cellprop_cutoff)
                         temp = dc.get_acts(temp, 'acts')
