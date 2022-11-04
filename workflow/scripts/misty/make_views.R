@@ -137,6 +137,6 @@ rownames(para) <- rownames(datas[[1]])
 
 if(exists("snakemake")){
   saveRDS(misty.views, snakemake@output[[1]])
-  write_csv(para, snakemake@output[[2]])
+  write.csv(para, snakemake@output[[2]])
 }
 
