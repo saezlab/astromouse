@@ -196,30 +196,30 @@ results <- lapply(result_folders %>% collect_results(), function(x){
   return(x)
 }) %>% reformat_samples(., view = view)
 
-imp.signature <- extract_signature(results, type = "importance", trim = 2)
-
-imp.signature.pca <- prcomp(imp.signature %>% select(-sample))
+# imp.signature <- extract_signature(results, type = "importance", trim = 2)
+# 
+# imp.signature.pca <- prcomp(imp.signature %>% select(-sample))
 
 # plots -------------------------------------------------------------------
 
 if(exists("snakemake")) pdf(snakemake@output[[1]])
-ggplot(
-  left_join(bind_cols(sample = metadata %>%  pull(sample), imp.signature.pca$x), metadata, by = 'sample'),
-  aes(x = PC1, y = PC2)
-) +
-  geom_point(aes(color = as.factor(condition)), size = 1) +
-  labs(color = "Condition") +
-  theme_classic()
-
-
-
-ggplot(
-  left_join(bind_cols(sample = metadata %>%  pull(sample), imp.signature.pca$x), metadata, by = 'sample'),
-  aes(x = PC1, y = PC2)
-) +
-  geom_point(aes(color = as.factor(mouse)), size = 1) +
-  labs(color = "Mouse") +
-  theme_classic()
+# ggplot(
+#   left_join(bind_cols(sample = metadata %>%  pull(sample), imp.signature.pca$x), metadata, by = 'sample'),
+#   aes(x = PC1, y = PC2)
+# ) +
+#   geom_point(aes(color = as.factor(condition)), size = 1) +
+#   labs(color = "Condition") +
+#   theme_classic()
+# 
+# 
+# 
+# ggplot(
+#   left_join(bind_cols(sample = metadata %>%  pull(sample), imp.signature.pca$x), metadata, by = 'sample'),
+#   aes(x = PC1, y = PC2)
+# ) +
+#   geom_point(aes(color = as.factor(mouse)), size = 1) +
+#   labs(color = "Mouse") +
+#   theme_classic()
 
 if(view != 'functional'){
   results %>% plot_improvement_stats()
@@ -233,10 +233,10 @@ if(view != 'functional'){
   results %>% plot_interaction_heatmap('para', trim = plot_params$trim, cutoff = plot_params$cutoff, clean = cleaning)
 }
 
-fviz_pca_var(imp.signature.pca,
-             col.var = "cos2", select.var = list(cos2 = 15), repel = TRUE,
-             gradient.cols = c("#666666", "#377EB8", "#E41A1C"), col.circle = NA
-) + theme_classic()
+# fviz_pca_var(imp.signature.pca,
+#              col.var = "cos2", select.var = list(cos2 = 15), repel = TRUE,
+#              gradient.cols = c("#666666", "#377EB8", "#E41A1C"), col.circle = NA
+# ) + theme_classic()
 
 # if(exists("snakemake")) dev.off()
 
