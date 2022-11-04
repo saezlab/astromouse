@@ -195,7 +195,7 @@ for key in interactions.keys():
                     sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, hue = 'mouse', ax = axs[idx[0]], order = ['Flight', 'Control'])
                 else:
                     sns.stripplot(x = "condition", y = "Importance", data = imp_to_plot, ax = axs[idx[0]], order = ['Flight', 'Control'])
-                axs[idx[0]].set_title(row['Predictor'] + ' -> ' + row['Target'])
+                axs[idx[0]].set_title(predictor_name + ' -> ' + target_name)
 
                 #plot correlations
                 idx = [5 if inter_to_plot.shape[0] == 1 else (index, 5)]
@@ -206,7 +206,7 @@ for key in interactions.keys():
                     sns.stripplot(x = "condition", y = "Correlation", data = imp_to_plot, hue = 'mouse', ax = axs[idx[0]], order = ['Flight', 'Control'])
                 else:
                     sns.stripplot(x = "condition", y = "Correlation", data = imp_to_plot, ax = axs[idx[0]], order = ['Flight', 'Control'])
-                axs[idx[0]].set_title(row['Predictor'] + ' -> ' + row['Target'])
+                axs[idx[0]].set_title(predictor_name + ' -> ' + target_name)
 
                 mice.append(flight_mouse)
                 mice.append(ground_mouse)
@@ -242,7 +242,7 @@ for key in interactions.keys():
                     idx = [plot_column if inter_to_plot.shape[0] == 1 else (index, plot_column)]
                     sc.pl.spatial(temp, img_key=None, library_id=mouse['sample'],\
                         color=mouse['Predictor'], size=1.5, na_color = '#A69F9F', legend_loc=None, show=False, ax=axs[idx[0]]) #vmin = (lims.loc[mouse['Predictor'], 'llim']*1.1),\vmax = (lims.loc[mouse['Predictor'], 'ulim']*1.1)
-                    axs[idx[0]].set_title(mouse['mouse'] + ': ' + mouse['Predictor'])
+                    axs[idx[0]].set_title(mouse['mouse'] + ': ' + predictor_name)
                     axs[idx[0]].set_facecolor('#D9D9D9')
                     axs[idx[0]].set_ylabel('')
                     axs[idx[0]].set_xlabel('')
@@ -257,7 +257,7 @@ for key in interactions.keys():
                     idx = [plot_column  + 1 if inter_to_plot.shape[0] == 1 else (index, plot_column + 1)]
                     sc.pl.spatial(temp, img_key=None, library_id=mouse['sample'],\
                         color=mouse['Target'], size=1.5, na_color = '#A69F9F', legend_loc=None, show=False, ax=axs[idx[0]]) #vmin = (lims.loc[mouse['Target'], 'llim']*1.1),\vmax = (lims.loc[mouse['Target'], 'ulim']*1.1), 
-                    axs[idx[0]].set_title(mouse['mouse'] + ': ' + mouse['Target'])
+                    axs[idx[0]].set_title(mouse['mouse'] + ': ' + target_name)
                     axs[idx[0]].set_facecolor('#D9D9D9')
                     axs[idx[0]].set_ylabel('')
                     axs[idx[0]].set_xlabel('')
