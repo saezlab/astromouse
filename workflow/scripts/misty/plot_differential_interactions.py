@@ -93,7 +93,7 @@ print(acts)
 # %%
 #Read in paraview and associate with corresponding cells
 paraview = pd.read_csv(paraviews_fp, index_col=0, sep = ',').filter(adata.obs.index, axis = 0)
-adata.obsm['paraview'] = paraview
+acts.obsm['paraview'] = paraview
 
 # %%
 df = [pd.read_csv(file, index_col=0, sep=',') for file in interactions_fp]
