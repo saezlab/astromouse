@@ -23,7 +23,8 @@ rule get_func_views:
     params:
         skip = 'intra'
     output:
-        view = 'results/ST/Misty/{tissue}/functional/views/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/functional/views/{sample}_view.rds',
+        paraview = 'results/ST/Misty/{tissue}/functional/views/{sample}_paraview.csv'
     conda:
         "../envs/misty.yml"
     script:
@@ -34,7 +35,8 @@ rule get_celltype_views:
         'results/ST/Misty/{tissue}_coordinates.csv',
         'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
-        view = 'results/ST/Misty/{tissue}/celltype/views/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/celltype/views/{sample}_view.rds',
+        paraview = 'results/ST/Misty/{tissue}/celltype/views/{sample}_paraview.csv'
     params:
         cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     conda:
@@ -48,7 +50,8 @@ rule get_pathwaysCT_views:
         'results/ST/functional/{tissue}_activities_pathways.csv',
         'results/ST/ST_{tissue}_deconvoluted.csv'
     output:
-        view = 'results/ST/Misty/{tissue}/pathwaysCT/views/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/pathwaysCT/views/{sample}_view.rds',
+        paraview = 'results/ST/Misty/{tissue}/pathwaysCT/views/{sample}_paraview.csv'
     conda:
         "../envs/misty.yml"
     script:
@@ -62,11 +65,20 @@ rule get_CTpathways_views:
     params:
         cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     output:
-        view = 'results/ST/Misty/{tissue}/CTpathways/views/{sample}_view.rds'
+        view = 'results/ST/Misty/{tissue}/CTpathways/views/{sample}_view.rds',
+        paraview = temp('results/ST/Misty/{tissue}/CTpathways/views/{sample}_paraview.csv')
     conda:
         "../envs/misty.yml"
     script:
         "../scripts/misty/make_views.R"
+
+rule get_combine_paraviews:
+    input:
+        lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/views/{sample}_paraview.csv', sample = config['samples'][w.tissue])
+    output:
+        'results/ST/Misty/{tissue}/{view_type}/paraviews.csv'
+    shell:
+        "awk 'FNR==1 && NR!=1{{next;}}{{print}}' {input} >> {output}"
 
 rule run_views:
     input:
@@ -145,7 +157,8 @@ def dif_interactions_inputs(wildcards):
     files = {'data': 'results/ST/{wildcards.tissue}_wImages.h5ad'.format(wildcards=wildcards),\
             'importances': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_importances.csv'.format(wildcards=wildcards),\
             'diffInteractions': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_diffInteractions.csv'.format(wildcards=wildcards),
-            'correlations': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_Corr.csv'.format(wildcards=wildcards)\
+            'correlations': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_Corr.csv'.format(wildcards=wildcards),\
+            'paraviews': 'results/ST/Misty/{wildcards.tissue}/{wildcards.view_type}/paraviews.csv'
             }
     if (wildcards.view_type in ['celltype', 'pathwaysCT', 'CTpathways']):
         files['cellprops'] = 'results/ST/ST_{wildcards.tissue}_deconvoluted.csv'.format(wildcards=wildcards)

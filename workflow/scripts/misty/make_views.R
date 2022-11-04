@@ -132,8 +132,11 @@ para.name <- names(misty.views)[grepl('para', names(misty.views))]
 
 misty.views <- misty.views %>% rename_view(., old.name = para.name, new.name = 'paraview', new.abbrev = 'para')
 
+para <- misty.views$paraview$data
+rownames(para) <- rownames(datas[[1]])
 
 if(exists("snakemake")){
   saveRDS(misty.views, snakemake@output[[1]])
+  write_csv(para, snakemake@output[[2]])
 }
 

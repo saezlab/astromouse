@@ -23,6 +23,7 @@ if 'snakemake' in locals():
     TFs_fp = snakemake.input.get('GRNs')
     cellprop_fp = snakemake.input.get('cellprops')
     corr_fp = snakemake.input.get('correlations')
+    paraviews_fp = snakemake.input.get('paraviews')
 
     
     importances_fp = [snakemake.input.get('importances')]
