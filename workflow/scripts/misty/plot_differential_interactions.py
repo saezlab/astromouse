@@ -91,6 +91,11 @@ acts = dc.get_acts(adata, 'acts')
 print(acts)
 
 # %%
+#Read in paraview and associate with corresponding cells
+paraview = pd.read_csv(paraviews_fp, index_col=0, sep = ',').filter(adata.obs.index, axis = 0)
+adata.obsm['paraview'] = paraview
+
+# %%
 df = [pd.read_csv(file, index_col=0, sep=',') for file in interactions_fp]
 df = pd.concat(df, join='outer', axis=0)
 mask = pd.DataFrame({'target':[ (target in activities.columns) for target in df['Target'] ],\
@@ -208,13 +213,18 @@ for key in interactions.keys():
                 mice_to_plot = meta[meta['Interaction']  == row['inter']].sort_values('condition', ascending=False)
                 
                 for (_, mouse), plot_column in zip(mice_to_plot.iterrows(), [1,3]):
-                    if (view_type == 'celltype') or (view_type == 'pathwaysCT'):
-                        temp = acts.copy()
-                        temp.obsm['acts'] = temp.obsm['acts'].where(temp.obsm['acts'] >= cellprop_cutoff)
-                        temp = dc.get_acts(temp, 'acts')
-                        temp = temp[temp.obs.library_id == mouse['sample'], :]
+
+                    temp = acts.copy()
+                    if inter_to_plot['view'].to_list()[0] == 'para':
+                        plotting = 'paraview'
                     else:
-                        temp = acts[acts.obs.library_id == mouse['sample'], :].copy()
+                        plotting = 'acts'
+                        # masking cells below a specific threshold (only in intra/intra_act)
+                        if (view_type == 'celltype') or (view_type == 'pathwaysCT'):
+                            temp.obsm['acts'] = temp.obsm['acts'].where(temp.obsm['acts'] >= cellprop_cutoff)
+
+                    temp = dc.get_acts(temp, plotting)
+                    temp = temp[temp.obs.library_id == mouse['sample'], :] #select cells of one mouse
 
                     idx = [plot_column if inter_to_plot.shape[0] == 1 else (index, plot_column)]
                     sc.pl.spatial(temp, img_key=None, library_id=mouse['sample'],\
@@ -224,13 +234,12 @@ for key in interactions.keys():
                     axs[idx[0]].set_ylabel('')
                     axs[idx[0]].set_xlabel('')
 
+                    temp = acts.copy()
+                    # masking cells below a specific threshold (only in intra/intra_act)
                     if (view_type == 'celltype') or (view_type == 'CTpathways'):
-                        temp = acts.copy()
                         temp.obsm['acts'] = temp.obsm['acts'].where(temp.obsm['acts'] >= cellprop_cutoff)
                         temp = dc.get_acts(temp, 'acts')
-                        temp = temp[temp.obs.library_id == mouse['sample'], :]
-                    else:
-                        temp = acts[acts.obs.library_id == mouse['sample'], :].copy()
+                    temp = temp[temp.obs.library_id == mouse['sample'], :]
 
                     idx = [plot_column  + 1 if inter_to_plot.shape[0] == 1 else (index, plot_column + 1)]
                     sc.pl.spatial(temp, img_key=None, library_id=mouse['sample'],\

@@ -158,7 +158,7 @@ def dif_interactions_inputs(wildcards):
             'importances': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_importances.csv'.format(wildcards=wildcards),\
             'diffInteractions': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_diffInteractions.csv'.format(wildcards=wildcards),
             'correlations': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_Corr.csv'.format(wildcards=wildcards),\
-            'paraviews': 'results/ST/Misty/{wildcards.tissue}/{wildcards.view_type}/paraviews.csv'
+            'paraviews': 'results/ST/Misty/{wildcards.tissue}/{wildcards.view_type}/paraviews.csv'.format(wildcards=wildcards)
             }
     if (wildcards.view_type in ['celltype', 'pathwaysCT', 'CTpathways']):
         files['cellprops'] = 'results/ST/ST_{wildcards.tissue}_deconvoluted.csv'.format(wildcards=wildcards)
