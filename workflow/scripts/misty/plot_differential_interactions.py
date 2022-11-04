@@ -24,6 +24,7 @@ if 'snakemake' in locals():
     cellprop_fp = snakemake.input.get('cellprops')
     corr_fp = snakemake.input.get('correlations')
     paraviews_fp = snakemake.input.get('paraviews')
+    cell_type_annot_fp = snakemake.input.get('cell_annot')
 
     
     importances_fp = [snakemake.input.get('importances')]
@@ -45,6 +46,7 @@ else:
     TFs_fp = 'results/ST/functional/{0}_activities_TFs.csv'.format(tissue)
     cellprop_fp = 'results/ST/ST_{0}_deconvoluted.csv'.format(tissue)
     corr_fp = 'results/ST/Misty/{0}/{1}_Corr.csv'.format(tissue, view_type)
+    cell_type_annot_fp ='data/original/MO/MO_cluster_metadata.csv'
 
     interactions_fp = interactions_fp[0:1]
     importances_fp = importances_fp[0:1]
@@ -94,6 +96,10 @@ print(acts)
 #Read in paraview and associate with corresponding cells
 paraview = pd.read_csv(paraviews_fp, index_col=0, sep = ',').filter(adata.obs.index, axis = 0)
 acts.obsm['paraview'] = paraview
+
+# read in celltype cluster mapping
+if cell_type_annot_fp is not None:
+    cell_annot = pd.read_csv(cell_type_annot_fp, sep = ',')
 
 # %%
 df = [pd.read_csv(file, index_col=0, sep=',') for file in interactions_fp]
@@ -151,6 +157,13 @@ for key in interactions.keys():
             for index, row in inter_to_plot.iterrows():
                 imp_to_plot = current_imp[current_imp['Interaction'] == row['inter']].copy()
                 imp_to_plot = imp_to_plot.sort_values('mouse')
+
+                predictor_name = row['Predictor']
+                target_name = row['Target']
+                if view_type in ['celltype', 'CTpathways']:
+                    target_name = cell_annot[cell_annot['clusterID'] == target_name]['clusterAbrv'].values[0]
+                elif view_type in ['celltype', 'pathwaysCT']:
+                    predictor_name = cell_annot[cell_annot['clusterID'] == predictor_name]['clusterAbrv'].values[0]
 
                 flight_mouse = imp_to_plot[imp_to_plot['condition'] == 'Flight']
                 ground_mouse = imp_to_plot[imp_to_plot['condition'] == 'Control']

@@ -161,7 +161,8 @@ def dif_interactions_inputs(wildcards):
             'paraviews': 'results/ST/Misty/{wildcards.tissue}/{wildcards.view_type}/paraviews.csv'.format(wildcards=wildcards)
             }
     if (wildcards.view_type in ['celltype', 'pathwaysCT', 'CTpathways']):
-        files['cellprops'] = 'results/ST/ST_{wildcards.tissue}_deconvoluted.csv'.format(wildcards=wildcards)
+        files['cellprops'] = 'results/ST/ST_{wildcards.tissue}_deconvoluted.csv'.format(wildcards=wildcards),
+        files['cell_annot'] = 'data/original/MO/MO_cluster_metadata.csv'
 
     if (wildcards.view_type in ['functional', 'pathwaysCT', 'CTpathways']):
         files['pathways'] = 'results/ST/functional/{wildcards.tissue}_activities_pathways.csv'.format(wildcards=wildcards)
