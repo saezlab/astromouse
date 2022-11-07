@@ -5,20 +5,6 @@ def activities_inputs(wildcards):
         files['net'] = 'results/MO/celloracle/{wildcards.tissue}/GRNs/'.format(wildcards=wildcards)
     return files
 
-rule plot_pathways:
-    input:
-        unpack(activities_inputs)
-    params:
-        lambda w: config['functional'][w.network]
-    output:
-        'plots/functional/{tissue}_{network}.pdf'
-    conda:
-        "../envs/astromouse.yml"
-    resources:
-        mem_mb=40000
-    script:
-        '../scripts/functional/plots_pathways.py'
-
 rule get_PDactivities:
     input:
         unpack(activities_inputs)
@@ -30,3 +16,48 @@ rule get_PDactivities:
         "../envs/astromouse.yml"
     script:
         "../scripts/functional/compute_activities.py"
+
+rule plot_pathways:
+    input:
+        adata = 'results/ST/{tissue}_wImages.h5ad',
+        functional = 'results/ST/functional/{tissue}_activities_pathways.csv'
+    output:
+        'plots/functional/{tissue}/pathways.pdf'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        '../scripts/functional/spatial_plots.py'
+
+rule plot_pathway_paraviews:
+    input:
+        adata = 'results/ST/{tissue}_wImages.h5ad',
+        functional = 'results/ST/Misty/{tissue}/CTpathways/paraviews.csv'
+    output:
+        'plots/functional/{tissue}/pathway_paraviews.pdf'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        '../scripts/functional/spatial_plots.py'
+
+
+rule plot_slides:
+    input:
+        adata = 'results/ST/{tissue}_wImages.h5ad'
+    output:
+        'plots/functional/{tissue}/slides.pdf'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        '../scripts/functional/slide_plots.py'
+
+    
+rule plot_ROIs:
+    input:
+        adata = 'results/ST/{tissue}_wImages.h5ad'
+    output:
+        'plots/functional/{tissue}/spatial_clusters.pdf',
+        'plots/functional/{tissue}/ROIs.pdf'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        '../scripts/functional/plot_ROIs.py'
