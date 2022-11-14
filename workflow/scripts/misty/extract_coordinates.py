@@ -17,11 +17,9 @@ else:
 adata = sc.read_h5ad(adata_fp)
 
 # %%
-coords = adata.obs.filter(['array_row', 'array_col', 'library_id'])
+coords = adata.obs.filter(['array_row', 'array_col', 'library_id', 'seurat_clusters'])
 coords[['x','y']] = pd.DataFrame(adata.obsm['spatial'], columns=['x', 'y'], index = coords.index)
 
 coords.to_csv(output_fp)
-
-
 
 # %%

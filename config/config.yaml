@@ -22,6 +22,11 @@ functional:
     pathways: {normalisation: 'log1p', method: 'mlm', top_targets: 300}
     GRNs: {normalisation: 'log1p', method: 'mlm'}
 
+regions:
+    brain:
+        all: []
+        CTX: [1, 9]
+
 misty:
     random_seed: 42
     views:

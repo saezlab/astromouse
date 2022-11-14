@@ -114,6 +114,43 @@ rule plot_misty_results:
     script:
         "../scripts/misty/plot_model_results.R"
 
+# ############################
+# #   Brain region specific models
+# ############################
+
+# rule get_region_celltype_views:
+#     input:
+#         'results/ST/Misty/{tissue}_coordinates.csv',
+#         'results/ST/ST_{tissue}_deconvoluted.csv'
+#     output:
+#         view = 'results/ST/Misty/{tissue}/{region}/celltype/views/{sample}_view.rds',
+#         paraview = 'results/ST/Misty/{tissue}/{region}/celltype/views/{sample}_paraview.csv'
+#     params:
+#         cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff'),
+#         clusters = lambda w: config['regions']['brain'][w.region]
+#     conda:
+#         "../envs/misty.yml"
+#     script:
+#         "../scripts/misty/make_region_views.R"
+
+# rule run_region_views:
+#     input:
+#         view = 'results/ST/Misty/{tissue}/{region}/celltype/views/{sample}_view.rds'
+#     output: 
+#         directory('results/ST/Misty/{tissue}/{region}/celltype/models/{sample}')
+#     params:
+#         seed = config['misty'].get("random_seed", 42),
+#         bypass_intra = lambda wildcards: config['misty'][wildcards.view_type].get('bypass_intra', False)
+#     conda:
+#         "../envs/misty.yml"
+#     threads: 6
+#     resources:
+#         mem_mb=25000,
+#         disk_mb=1000,
+#         time='12:00:00'
+#     script:
+#         "../scripts/misty/run.R"
+
 ############################
 #   Get interactions from misty models
 #   that are only found in one of the conditions
@@ -186,3 +223,48 @@ rule plot_dif_interactions:
         mem_mb=25000
     script:
         "../scripts/misty/plot_differential_interactions.py"
+
+############################
+#   Relating pathway activities to TF activity changes
+#   Only for specific cell types
+############################
+
+rule TF_pathway_corr:
+    input:
+        data = 'results/ST/{tissue}_wImages.h5ad',
+        diff_inter = 'results/Misty/{tissue}/CTpathways_diffInteractions.csv',
+        pathways = 'results/ST/functional/{tissue}_activities_pathways.csv',
+        pathway_paras = 'results/ST/Misty/{tissue}/CTpathways/paraviews.csv',
+        TFs = 'results/ST/functional/{tissue}_activities_GRNs.csv',
+        cellProp = 'results/ST/ST_{tissue}_deconvoluted.csv'
+    params:
+        sign= 0.05,
+        cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
+    output:
+        'results/Misty/{tissue}/interactions_TFPathway_ttests.csv',
+        'results/Misty/{tissue}/interactions_TFPathway_corrs.csv'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        "../scripts/misty/pathway_TF_corrs.py"
+
+rule TF_pathway_spatial_plots:
+    input:
+        data = 'results/ST/{tissue}_wImages.h5ad',
+        diff_inter = 'results/Misty/{tissue}/CTpathways_diffInteractions.csv',
+        pathways = 'results/ST/functional/{tissue}_activities_pathways.csv',
+        pathway_paras = 'results/ST/Misty/{tissue}/CTpathways/paraviews.csv',
+        TFs = 'results/ST/functional/{tissue}_activities_GRNs.csv',
+        cellProp = 'results/ST/ST_{tissue}_deconvoluted.csv',
+        ct_annot = 'data/original/MO/MO_cluster_metadata.csv',
+        ttests = 'results/Misty/{tissue}/interactions_TFPathway_ttests.csv',
+        corrs = 'results/Misty/{tissue}/interactions_TFPathway_corrs.csv'
+    params:
+        sign= 0.05,
+        cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
+    output:
+        'plots/Misty/{tissue}/interactions_TFPathway.csv'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        "../scripts/misty/pathway_TF_corrs.py"
