@@ -8,6 +8,7 @@ data/
 logs/
 plots/
 results/
+forPaper/
 
 #Snakemake stuff
 .snakemake/
