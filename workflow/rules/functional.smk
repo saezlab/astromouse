@@ -39,6 +39,17 @@ rule plot_pathway_paraviews:
     script:
         '../scripts/functional/spatial_plots.py'
 
+rule plot_stereoscope:
+    input:
+        adata = 'results/ST/{tissue}_wImages.h5ad',
+        functional = 'results/ST/ST_{tissue}_deconvoluted.csv'
+    output:
+        'plots/functional/{tissue}/stereoscope.pdf'
+    conda:
+        "../envs/astromouse.yml"
+    script:
+        '../scripts/functional/spatial_plots.py'
+
 
 rule plot_slides:
     input:

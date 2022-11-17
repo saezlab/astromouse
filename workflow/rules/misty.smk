@@ -101,6 +101,7 @@ rule run_views:
 rule plot_misty_results:
     input:
         'data/original/ST/metadata_visium_{tissue}.csv',
+        'data/original/MO/MO_cluster_metadata.csv',
         lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/models/{sample}', sample = config['samples'][w.tissue])
     output: 
         'plots/Misty/{tissue}/{view_type}_misty.pdf',
@@ -263,8 +264,8 @@ rule TF_pathway_spatial_plots:
         sign= 0.05,
         cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     output:
-        'plots/Misty/{tissue}/interactions_TFPathway.csv'
+        'plots/Misty/{tissue}/interactions_TFPathway.pdf'
     conda:
         "../envs/astromouse.yml"
     script:
-        "../scripts/misty/pathway_TF_corrs.py"
+        "../scripts/misty/plot_TFPathway_corrs.py"

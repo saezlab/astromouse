@@ -10,9 +10,9 @@ rule all:
     input:
         # expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
         # expand('results/MO/{tissue}.h5mu', tissue = ['brain', 'heart']),
-        expand('plots/functional/{tissue}_pathways.pdf', tissue = ['brain']),
+        expand('plots/functional/{tissue}/pathways.pdf', tissue = ['brain']),
         # expand('plots/Misty/brain/{view_type}_misty.pdf', view_type = ['pathwaysCT', 'celltype']),
-        expand('plots/Misty/brain/{view_type}_diffplots.pdf', view_type = ['pathwaysCT', 'celltype']),
+        expand('plots/Misty/brain/{view_type}_diffplots.pdf', view_type = ['CTpathways', 'celltype']),
         # expand('plots/Misty/{tissue}/functional_diffplots.pdf', tissue = ['brain', 'heart']),
         # expand('plots/Misty/{tissue}/functional_misty.pdf', tissue = ['brain', 'heart'])
         

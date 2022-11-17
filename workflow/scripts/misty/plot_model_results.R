@@ -114,6 +114,28 @@ reformat_samples <- function(misty.results, view){
   return(results)
 }
 
+reformat_targets <- function(misty.results, view, mapping_df){
+  
+  results <- lapply(misty.results, function(x){
+    if('target' %in% colnames(x)){
+      if(view == 'celltype' | view == 'CTpathways'){
+        x$target <- plyr::mapvalues(x %>% dplyr::pull(target), mapping_df$clusterID, mapping_df$clusterAbrv)
+      }
+      
+    }
+    
+    if('Target' %in% colnames(x)){
+      if(view == 'celltype' | view == 'CTpathways'){
+        x$Target <- plyr::mapvalues(x %>% dplyr::pull(Target), mapping_df$clusterID, mapping_df$clusterAbrv)
+      }
+      
+    }
+    return(x)
+  })
+  
+  return(results)
+}
+
 # define input and outputs ------------------------------------------------
 
 cat("DEBUG: defining inputs, outputs, and script parameters\n")
@@ -126,20 +148,22 @@ if(exists("snakemake")){
   plot_params <- snakemake@params[[1]]
   
   metadata_fp <- snakemake@input[[1]]
-  result_folders <- unlist(snakemake@input[2:length(snakemake@input)])
+  ct_annot_fp <- snakemake@input[[2]]
+  result_folders <- unlist(snakemake@input[3:length(snakemake@input)])
   
 }else{
   tissue <- 'brain'
-  view <- 'celltype'
+  view <- 'CTpathways'
   
   plot_params <- list(trim = 1, cutoff = 1)
   
   samples <- list.files(paste('data/original/ST/visium_data', tissue, sep = '_')) %>% sort()
   
-  result_folders <- paste0(paste('results/ST/Misty', tissue, sep = .Platform$file.sep), '/', samples, '/', view, '_misty_model')
+  result_folders <- paste0(paste('results/ST/Misty', tissue, view, sep = .Platform$file.sep), .Platform$file.sep, 'models', .Platform$file.sep, samples)
   
   #files for testing in Rstudio
   metadata_fp <- paste('data/original/ST/metadata_visium_', tissue,'.csv', sep = '')
+  ct_annot_fp <- 'data/original/MO/MO_cluster_metadata.csv'
   
 }
 
@@ -147,7 +171,9 @@ if(exists("snakemake")){
 # load data ---------------------------------------------------------------
 
 result_folders <-  result_folders %>% sort()
-samples <- result_folders %>% dirname() %>% basename()
+samples <- result_folders %>% basename()
+
+ct_annot <- read.csv(ct_annot_fp)
 
 metadata <- read.csv(metadata_fp)
 
@@ -194,7 +220,7 @@ results <- lapply(result_folders %>% collect_results(), function(x){
     x$view <- gsub('\\.$', '', x$view)
   }
   return(x)
-}) %>% reformat_samples(., view = view)
+}) %>% reformat_samples(., view = view) %>% reformat_targets(., view = view, mapping_df = ct_annot)
 
 # imp.signature <- extract_signature(results, type = "importance", trim = 2)
 # 
@@ -255,7 +281,7 @@ grouped.results <- lapply(levels(metadata$condition), function(group){
   }
   group.results <- result_folders[keep] %>% collect_results()
   
-  group.results <- group.results %>% reformat_samples(., view = view)
+  group.results <- group.results %>% reformat_samples(., view = view) %>% reformat_targets(., view = view, mapping_df = ct_annot)
 })
 
 names(grouped.results) <- levels(metadata$condition)

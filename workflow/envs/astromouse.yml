@@ -4,10 +4,10 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - python=3.8
+  - python=3.9
   - cython
   - ipython
-  - scanpy=1.8.2
+  - scanpy=1.9.1
   - loompy=3.0.6
   - python-igraph
   - louvain>=0.6,!=0.6.2
