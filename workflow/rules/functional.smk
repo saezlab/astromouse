@@ -42,13 +42,16 @@ rule plot_pathway_paraviews:
 rule plot_stereoscope:
     input:
         adata = 'results/ST/{tissue}_wImages.h5ad',
-        functional = 'results/ST/ST_{tissue}_deconvoluted.csv'
+        functional = 'results/ST/ST_{tissue}_deconvoluted.csv',
+        annotations = 'data/original/MO/MO_cluster_metadata.csv'
+    params:
+        cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     output:
         'plots/functional/{tissue}/stereoscope.pdf'
     conda:
         "../envs/astromouse.yml"
     script:
-        '../scripts/functional/spatial_plots.py'
+        '../scripts/functional/stereoscope_plots.py'
 
 
 rule plot_slides:
