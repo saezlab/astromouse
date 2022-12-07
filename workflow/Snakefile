@@ -8,7 +8,7 @@ from glob import glob
 # heart_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/original/ST/visium_data_{0}/'.format('heart'), '*'))]
 rule all:
     input:
-        'plots/functional/{tissue}/stereoscope_proportions.pdf',
+        'plots/functional/brain/stereoscope_proportions.pdf',
         expand('plots/functional/brain/{plot}.pdf', plot = ['pathways','pathway_paraviews', 'stereoscope', 'slides', 'ROIs']),
         'plots/Misty/brain/interactions_TFPathway.pdf',
         expand('plots/Misty/brain/{view_type}_diffplots.pdf', view_type = ['CTpathways', 'celltype']),
