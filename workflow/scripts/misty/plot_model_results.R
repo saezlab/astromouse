@@ -102,9 +102,9 @@ reformat_samples <- function(misty.results, view){
   results <- lapply(misty.results, function(x){
     if('sample' %in% colnames(x)){
       if(view == 'celltype' | view == 'CTpathways'){
-        x$sample <- x$sample %>% dirname() %>% basename()  
+        x$sample <- x$sample %>% dirname() %>% basename()
       }else{
-        x$sample <- x$sample %>% basename()  
+        x$sample <- x$sample %>% basename() 
       }
       
     }
@@ -130,6 +130,14 @@ reformat_targets <- function(misty.results, view, mapping_df){
       }
       
     }
+    
+    if('Predictor' %in% colnames(x)){
+      if(view == 'celltype'){
+        x$Predictor <- plyr::mapvalues(x %>% dplyr::pull(Predictor), mapping_df$clusterID, mapping_df$clusterAbrv)
+      }
+      
+    }
+    
     return(x)
   })
   
