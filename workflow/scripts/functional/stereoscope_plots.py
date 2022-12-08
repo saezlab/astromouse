@@ -51,7 +51,8 @@ acts = dc.get_acts(adata, 'acts')
 print(acts)
 
 # %%
-lims = pd.DataFrame({ 'llim' : [np.min(acts.X[:,ii]) for ii in range(acts.n_vars)], 'ulim': [np.max(acts.X[:,ii]) for ii in range(acts.n_vars)]}, index = acts.var_names.values)
+# lims = pd.DataFrame({ 'llim' : [np.min(acts.X[:,ii]) for ii in range(acts.n_vars)], 'ulim': [np.max(acts.X[:,ii]) for ii in range(acts.n_vars)]}, index = acts.var_names.values)
+lims = pd.DataFrame([np.quantile(acts.X[:,ii][np.logical_not(np.isnan(acts.X[:,ii]))], [0.05, 0.95]) for ii in range(acts.n_vars)], columns = ['llim', 'ulim'], index = acts.var_names.values)
 lims['lim'] = [np.max(abs(acts.X[:,ii])) for ii in range(acts.n_vars)]
 print('Max and min values per pathway')
 print(lims)
