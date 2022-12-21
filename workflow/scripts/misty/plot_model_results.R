@@ -332,7 +332,7 @@ views %>% purrr::walk(function(current.view){
     ggplot2::scale_fill_gradient2(low = "red", mid = "white", high = "#8DA0CB", midpoint = 0) + ggplot2::labs(fill='-log10(p)') +
     geom_tile(data = long.data %>% dplyr::filter(.data$is.sig.05), aes(fill = .data$sig, color = is.sig.05), size = 1) + 
     scale_color_manual(guide = FALSE, values = c(`TRUE` = "black")) +
-    ggplot2::ggtitle(paste('Condition specific interactions in', current.view))
+    ggplot2::ggtitle(paste('Condition specific interactions in', gsub('intra_act', 'intra', current.view)))
   
   print(inter.plot)
   
