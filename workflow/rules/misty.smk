@@ -3,6 +3,7 @@
 #   sample by sample
 ############################
 
+# extract coordinates and metadata of each visium spot
 rule get_coords:
     input:
         data = 'results/ST/{tissue}_wImages.h5ad'
@@ -15,21 +16,28 @@ rule get_coords:
     script:
         "../scripts/misty/extract_coordinates.py"
 
-rule get_func_views:
-    input:
-        'results/ST/Misty/{tissue}_coordinates.csv',
-        'results/ST/functional/{tissue}_activities_GRNs.csv',
-        'results/ST/functional/{tissue}_activities_pathways.csv'
-    params:
-        skip = 'intra'
-    output:
-        view = 'results/ST/Misty/{tissue}/functional/views/{sample}_view.rds',
-        paraview = 'results/ST/Misty/{tissue}/functional/views/{sample}_paraview.csv'
-    conda:
-        "../envs/misty.yml"
-    script:
-        "../scripts/misty/make_views.R"
+#make Misty views with TF activities (from GRN, inferred with decoupler) as targets
+#with pathway activities as predictors
+#also exports the paraview values
+# (not used in analysis)
+# rule get_func_views:
+#     input:
+#         'results/ST/Misty/{tissue}_coordinates.csv',
+#         'results/ST/functional/{tissue}_activities_GRNs.csv',
+#         'results/ST/functional/{tissue}_activities_pathways.csv'
+#     params:
+#         skip = 'intra'
+#     output:
+#         view = 'results/ST/Misty/{tissue}/functional/views/{sample}_view.rds',
+#         paraview = 'results/ST/Misty/{tissue}/functional/views/{sample}_paraview.csv'
+#     conda:
+#         "../envs/misty.yml"
+#     script:
+#         "../scripts/misty/make_views.R"
 
+#make Misty views with cell type abundances (from Stereoscope) as targets
+#with cell type abundances as predictors
+#also exports the paraview values
 rule get_celltype_views:
     input:
         'results/ST/Misty/{tissue}_coordinates.csv',
@@ -44,19 +52,26 @@ rule get_celltype_views:
     script:
         "../scripts/misty/make_views.R"
 
-rule get_pathwaysCT_views:
-    input:
-        'results/ST/Misty/{tissue}_coordinates.csv',
-        'results/ST/functional/{tissue}_activities_pathways.csv',
-        'results/ST/ST_{tissue}_deconvoluted.csv'
-    output:
-        view = 'results/ST/Misty/{tissue}/pathwaysCT/views/{sample}_view.rds',
-        paraview = 'results/ST/Misty/{tissue}/pathwaysCT/views/{sample}_paraview.csv'
-    conda:
-        "../envs/misty.yml"
-    script:
-        "../scripts/misty/make_views.R"
+#make Misty views with pathway activities (from progeny, inferred with decoupler) as targets
+#with cell type abundances as predictors
+#also exports the paraview values
+# (not used in analysis)
+# rule get_pathwaysCT_views:
+#     input:
+#         'results/ST/Misty/{tissue}_coordinates.csv',
+#         'results/ST/functional/{tissue}_activities_pathways.csv',
+#         'results/ST/ST_{tissue}_deconvoluted.csv'
+#     output:
+#         view = 'results/ST/Misty/{tissue}/pathwaysCT/views/{sample}_view.rds',
+#         paraview = 'results/ST/Misty/{tissue}/pathwaysCT/views/{sample}_paraview.csv'
+#     conda:
+#         "../envs/misty.yml"
+#     script:
+#         "../scripts/misty/make_views.R"
 
+#make Misty views with cell type abundances as targets
+#with pathway activities (from progeny, inferred with decoupler) as predictors
+#also exports the paraview values
 rule get_CTpathways_views:
     input:
         'results/ST/Misty/{tissue}_coordinates.csv',
@@ -72,6 +87,7 @@ rule get_CTpathways_views:
     script:
         "../scripts/misty/make_views.R"
 
+#combine the paraview values of all samples to one csv file
 rule get_combine_paraviews:
     input:
         lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/views/{sample}_paraview.csv', sample = config['samples'][w.tissue])
@@ -80,6 +96,7 @@ rule get_combine_paraviews:
     shell:
         "awk 'FNR==1 && NR!=1{{next;}}{{print}}' {input} >> {output}"
 
+#generic rule to run a Misty model on a (sample's) Misty view
 rule run_views:
     input:
         view = 'results/ST/Misty/{tissue}/{view_type}/views/{sample}_view.rds'
@@ -98,6 +115,7 @@ rule run_views:
     script:
         "../scripts/misty/run.R"
 
+#analytical plots of the Misty models pooled across samples and conditions
 rule plot_misty_results:
     input:
         'data/original/ST/metadata_visium_{tissue}.csv',
@@ -115,48 +133,12 @@ rule plot_misty_results:
     script:
         "../scripts/misty/plot_model_results.R"
 
-# ############################
-# #   Brain region specific models
-# ############################
-
-# rule get_region_celltype_views:
-#     input:
-#         'results/ST/Misty/{tissue}_coordinates.csv',
-#         'results/ST/ST_{tissue}_deconvoluted.csv'
-#     output:
-#         view = 'results/ST/Misty/{tissue}/{region}/celltype/views/{sample}_view.rds',
-#         paraview = 'results/ST/Misty/{tissue}/{region}/celltype/views/{sample}_paraview.csv'
-#     params:
-#         cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff'),
-#         clusters = lambda w: config['regions']['brain'][w.region]
-#     conda:
-#         "../envs/misty.yml"
-#     script:
-#         "../scripts/misty/make_region_views.R"
-
-# rule run_region_views:
-#     input:
-#         view = 'results/ST/Misty/{tissue}/{region}/celltype/views/{sample}_view.rds'
-#     output: 
-#         directory('results/ST/Misty/{tissue}/{region}/celltype/models/{sample}')
-#     params:
-#         seed = config['misty'].get("random_seed", 42),
-#         bypass_intra = lambda wildcards: config['misty'][wildcards.view_type].get('bypass_intra', False)
-#     conda:
-#         "../envs/misty.yml"
-#     threads: 6
-#     resources:
-#         mem_mb=25000,
-#         disk_mb=1000,
-#         time='12:00:00'
-#     script:
-#         "../scripts/misty/run.R"
-
 ############################
 #   Get interactions from misty models
 #   that are only found in one of the conditions
 ############################
 
+#extract interactions that are condition specific
 rule get_dif_interactions:
     input:
         'data/original/ST/metadata_visium_{tissue}.csv',
@@ -169,6 +151,8 @@ rule get_dif_interactions:
     script:
         "../scripts/misty/get_differential_interactions.R"
 
+#from differential interactions, extract the correlation between target-predictor
+#sample by sample
 rule get_interaction_corr:
     input:
         interactions = 'results/Misty/{tissue}/{view_type}_diffInteractions.csv',
@@ -182,6 +166,7 @@ rule get_interaction_corr:
     script:
         "../scripts/misty/get_interactions_corr.R"
 
+#combine the interaction correlation of all samples to one csv file
 rule combine_interaction_corr:
     input:
         lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/correlations/{sample}_Corr.csv', sample = config['samples'][w.tissue])
@@ -190,7 +175,8 @@ rule combine_interaction_corr:
     shell:
         "awk 'FNR==1 && NR!=1{{next;}}{{print}}' {input} >> {output}"
 
-
+#input function for rule below
+#assigns the right files for plotting the predictors
 def dif_interactions_inputs(wildcards):
     files = {'data': 'results/ST/{wildcards.tissue}_wImages.h5ad'.format(wildcards=wildcards),\
             'importances': 'results/Misty/{wildcards.tissue}/{wildcards.view_type}_importances.csv'.format(wildcards=wildcards),\
@@ -210,6 +196,10 @@ def dif_interactions_inputs(wildcards):
 
     return files
 
+#for each differential interaction make
+#boxplots of predictor importances
+#spatial plots of target/predictor data for two samples
+#boxplots of the interaction correlation
 rule plot_dif_interactions:
     input:
         unpack(dif_interactions_inputs)
@@ -230,6 +220,7 @@ rule plot_dif_interactions:
 #   Only for specific cell types
 ############################
 
+#extract correlation of pathways and TF activities for differentially active pathways
 rule TF_pathway_corr:
     input:
         data = 'results/ST/{tissue}_wImages.h5ad',
@@ -249,6 +240,9 @@ rule TF_pathway_corr:
     script:
         "../scripts/misty/pathway_TF_corrs.py"
 
+#for each differential interaction make
+#spatial plots of pathway/TF activity for two samples
+#boxplots of the pathway-TF correlation
 rule TF_pathway_spatial_plots:
     input:
         data = 'results/ST/{tissue}_wImages.h5ad',

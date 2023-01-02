@@ -58,16 +58,16 @@ else:
     raise ValueError('The "network" wildcard can only take on "pathways", "GRNS" or "TFs" as value, to run either Progeny, celloracle GRNs or Dorothea regulons')
 
 # %%
+#run decoupler on the given PKN
 dc.decouple(mat=adata, net=model, source='source', target='target', weight='weight', methods = conf.get('method'),  verbose=True, use_raw=False)
 
 # %%
 print(adata)
 
 # %%
+#extract activities from the anndata object
 acts = dc.get_acts(adata, obsm_key='{0}_estimate'.format(conf.get('method')))
 print(acts)
-
-# %%
 acts = pd.DataFrame(acts.X, index=acts.obs.index, columns=acts.var.index)
 
 # %%

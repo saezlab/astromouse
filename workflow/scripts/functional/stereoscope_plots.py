@@ -32,15 +32,18 @@ else:
     annot_fp = 'data/original/MO/MO_cluster_metadata.csv'
 
 # %%
+#Load cluster annotation
 annot = pd.read_csv(annot_fp)
 
 
 # %%
+#Load anndata
 adata = sc.read_h5ad(adata_fp)
 del adata.layers['SCT']
 adata
 
 # %%
+#Load stereoscope results and reformt
 activities = pd.read_csv(functional_fp, index_col=0, sep=',')
 activities = activities.loc[adata.obs.index,:]
 activities.columns = annot['clusterAbrv']
@@ -51,7 +54,8 @@ acts = dc.get_acts(adata, 'acts')
 print(acts)
 
 # %%
-# lims = pd.DataFrame({ 'llim' : [np.min(acts.X[:,ii]) for ii in range(acts.n_vars)], 'ulim': [np.max(acts.X[:,ii]) for ii in range(acts.n_vars)]}, index = acts.var_names.values)
+#Extract upper and lower data limits across samples for each feature
+#Using 5th and 98th percentile to cut off extreme/outlier values from colorbar
 lims = pd.DataFrame([np.quantile(acts.X[:,ii][np.logical_not(np.isnan(acts.X[:,ii]))], [0.05, 0.98]) for ii in range(acts.n_vars)], columns = ['llim', 'ulim'], index = acts.var_names.values)
 lims['lim'] = [np.max(abs(acts.X[:,ii])) for ii in range(acts.n_vars)]
 print('Max and min values per pathway')
@@ -60,10 +64,12 @@ print(lims)
 
 if tissue == 'brain':
     with PdfPages(output_fp) as output_pdf:
+        #Loop over features (celltypes)
         for pathway in acts.var.index.values:
             fig, axs = plt.subplots(3, 4, figsize=(23, 15))
             axs = axs.flatten()
 
+            #Loop over samples
             for i, library in enumerate(
                 acts.obs.filter(['library_id','mouse'], axis = 1).drop_duplicates().sort_values('mouse')['library_id']
                 #[os.path.basename(os.path.dirname(sample)) for sample in sample_paths]
@@ -85,7 +91,7 @@ if tissue == 'brain':
                     # color_map = 'BrBG',
                     # colorbar_loc = None,
                     # vcenter = 0,
-                    ax=axs[i],
+                    ax=axs[i]
                 )
                 axs[i].set_title(ad.obs['mouse'][0])
                 axs[i].set_facecolor('#D9D9D9')
@@ -99,13 +105,14 @@ if tissue == 'brain':
 
 if tissue == 'heart':
     with PdfPages(output_fp) as output_pdf:
+        #Loop over samples
         for library in acts.obs.filter(['library_id','mouse'], axis = 1).drop_duplicates().sort_values('library_id')['library_id']:
             #[os.path.basename(os.path.dirname(sample)) for sample in sample_paths]
             fig, axs = plt.subplots(4, 4, figsize=(23, 20))
             axs = axs.flatten()
-
             ad = acts[acts.obs.library_id == library, :]#.copy()
-
+            
+            #Loop over features (celltypes)
             for i, pathway in enumerate(acts.var.index.values):
 
                 sc.pl.spatial(
@@ -116,14 +123,15 @@ if tissue == 'heart':
                     size=1.5,
                     legend_loc=None,
                     show=False,
+                    na_color = '#A69F9F',
                     # vmin = 0,
                     # vmax = 17589,
-                    # vmin = (lims.loc[pathway, 'llim']*1.1),
-                    # vmax = (lims.loc[pathway, 'ulim']*1.1),
+                    vmin = (lims.loc[pathway, 'llim']),
+                    vmax = (lims.loc[pathway, 'ulim']),
                     # color_map = 'BrBG',
                     # colorbar_loc = None,
                     # vcenter = 0,
-                    ax=axs[i],
+                    ax=axs[i]
                 )
                 axs[i].set_title(pathway)
                 axs[i].set_facecolor('#D9D9D9')

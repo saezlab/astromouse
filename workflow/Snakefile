@@ -1,11 +1,9 @@
 from snakemake.utils import min_version
 min_version("6.0")
 
+#config file containing parameters for the pipeline
 configfile: "config/config.yaml"
 
-from glob import glob
-# brain_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/original/ST/visium_data_{0}/'.format('brain'), '*'))]
-# heart_samples = [os.path.basename(folder) for folder in glob(os.path.join('data/original/ST/visium_data_{0}/'.format('heart'), '*'))]
 rule all:
     input:
         'plots/functional/brain/stereoscope_proportions.pdf',
@@ -14,37 +12,33 @@ rule all:
         expand('plots/Misty/brain/{view_type}_diffplots.pdf', view_type = ['CTpathways', 'celltype']),
         expand('plots/Misty/brain/{view_type}_misty.pdf', view_type = ['CTpathways', 'celltype']),
 
-
-
-module general:
-    snakefile: "rules/general.smk"
-    config: config
-
-use rule * from general
-
-module celloracle:
-    snakefile: "rules/celloracle.smk"
-    config: config
-
-use rule * from celloracle as CO_*
-
+#module to preprocess multiome and Visium data
+#from raw cellranger output (for images)
+#and already preprocessed and annotated seurat objects
 module preprocessing:
     snakefile: "rules/preprocessing.smk"
     config: config
-
 use rule * from preprocessing as PP_*
 
+#module to create GRN from multiome data
+#using the celloracle package and pipeline
+module celloracle:
+    snakefile: "rules/celloracle.smk"
+    config: config
+use rule * from celloracle as CO_*
+
+#module for
+#inference of TF (from GRN) and pathway (from progeny) activities
+#for the Visium data (used in Misty models)
+#and spatial plots of these data
 module functional:
     snakefile: "rules/functional.smk"
     config: config
-
 use rule * from functional as fun_*
 
+#module with spatial analysis pipeline
+#relying on Misty package
 module misty:
     snakefile: "rules/misty.smk"
     config: config
-
 use rule * from misty as misty_*
-
-# snakemake --profile config/slurm/ celloracle
-# conda env update --file local.yml --prune

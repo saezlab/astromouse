@@ -1,10 +1,12 @@
-
+#input function for activity prediction
 def activities_inputs(wildcards):
     files = {'data': 'results/ST/{wildcards.tissue}_wImages.h5ad'.format(wildcards=wildcards)}
     if wildcards.network == 'GRNs':
         files['net'] = 'results/MO/celloracle/{wildcards.tissue}/GRNs/'.format(wildcards=wildcards)
     return files
 
+#infer activity for Visium data
+#based on GRN (for TFs) or the progeny resource (for pathways)
 rule get_PDactivities:
     input:
         unpack(activities_inputs)
@@ -17,6 +19,7 @@ rule get_PDactivities:
     script:
         "../scripts/functional/compute_activities.py"
 
+#spatial plot of pathway activities
 rule plot_pathways:
     input:
         adata = 'results/ST/{tissue}_wImages.h5ad',
@@ -28,6 +31,7 @@ rule plot_pathways:
     script:
         '../scripts/functional/spatial_plots.py'
 
+#spatial plot of pathway paraviews (feature in Misty models)
 rule plot_pathway_paraviews:
     input:
         adata = 'results/ST/{tissue}_wImages.h5ad',
@@ -39,6 +43,7 @@ rule plot_pathway_paraviews:
     script:
         '../scripts/functional/spatial_plots.py'
 
+#spatial plot of cell type abundances (from stereoscope)
 rule plot_spatial_stereoscope:
     input:
         adata = 'results/ST/{tissue}_wImages.h5ad',
@@ -53,6 +58,7 @@ rule plot_spatial_stereoscope:
     script:
         '../scripts/functional/stereoscope_plots.py'
 
+#plot showing abundance of celltypes per sample
 rule plot_stereoscope:
     input:
         adata = 'results/ST/{tissue}_wImages.h5ad',
@@ -67,7 +73,7 @@ rule plot_stereoscope:
     script:
         '../scripts/functional/stereoscope_proportions.py'
 
-
+#spatial plot of sample images
 rule plot_slides:
     input:
         adata = 'results/ST/{tissue}_wImages.h5ad'
@@ -78,14 +84,14 @@ rule plot_slides:
     script:
         '../scripts/functional/slide_plots.py'
 
-    
-rule plot_ROIs:
-    input:
-        adata = 'results/ST/{tissue}_wImages.h5ad'
-    output:
-        'plots/functional/{tissue}/spatial_clusters.pdf',
-        'plots/functional/{tissue}/ROIs.pdf'
-    conda:
-        "../envs/astromouse.yml"
-    script:
-        '../scripts/functional/plot_ROIs.py'
+#not used in analysis
+# rule plot_ROIs:
+#     input:
+#         adata = 'results/ST/{tissue}_wImages.h5ad'
+#     output:
+#         'plots/functional/{tissue}/spatial_clusters.pdf',
+#         'plots/functional/{tissue}/ROIs.pdf'
+#     conda:
+#         "../envs/astromouse.yml"
+#     script:
+#         '../scripts/functional/plot_ROIs.py'

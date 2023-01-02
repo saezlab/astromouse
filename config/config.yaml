@@ -22,26 +22,16 @@ functional:
     pathways: {normalisation: 'log1p', method: 'mlm', top_targets: 300}
     GRNs: {normalisation: 'log1p', method: 'mlm'}
 
-regions:
-    brain:
-        all: []
-        CTX: [1, 9]
+# regions:
+#     brain:
+#         all: []
+#         CTX: [1, 9]
 
 misty:
     random_seed: 42
     views:
-        brain: ['celltype', 'functional', 'pathwaysCT', CTpathways]
+        brain: ['celltype', CTpathways]
         heart: ['functional']
-    functional:
-        bypass_intra: True
-        plots:
-            brain: {'trim': 2, 'cutoff': 1.5}
-            heart: {'trim': 2, 'cutoff': 1.5}
-    pathwaysCT:
-        bypass_intra: True
-        plots:
-            brain: {'trim': 1, 'cutoff': 1}
-            heart: {'trim': 1, 'cutoff': 1}
     CTpathways:
         bypass_intra: True
         plots:
@@ -51,3 +41,13 @@ misty:
         bypass_intra: False
         plots:
             brain: {'trim': 1, 'cutoff': 1}
+    # functional:
+    #     bypass_intra: True
+    #     plots:
+    #         brain: {'trim': 2, 'cutoff': 1.5}
+    #         heart: {'trim': 2, 'cutoff': 1.5}
+    # pathwaysCT:
+    #     bypass_intra: True
+    #     plots:
+    #         brain: {'trim': 1, 'cutoff': 1}
+    #         heart: {'trim': 1, 'cutoff': 1}

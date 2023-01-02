@@ -32,25 +32,30 @@ else:
 
 
 # %%
+#Load anndata
 adata = sc.read_h5ad(adata_fp)
 print(adata)
 
 # %%
+#Load celltype cluster annotation
 annot = pd.read_csv(ct_annot_fp)
 annot
 
 # %%
+#Load celltype proportionss from stereoscope
 ctProp = pd.read_csv(ctProp_fp, index_col=0)
-ctProp = ctProp.where(ctProp >= cellprop_cutoff)
+ctProp = ctProp.where(ctProp >= cellprop_cutoff) #set values below cutoff to NA
 ctProp = pd.merge(ctProp, adata.obs.filter(['library_id'], axis = 1), left_index=True, right_index=True)
 
 # %%
+#Count number of of non-NA spots per celltype and sample
 counts = ctProp.groupby(['library_id']).count().reset_index()
 counts.columns = ['library_id'] + annot['clusterAbrv'].tolist()
 counts = pd.melt(counts, id_vars='library_id', var_name='celltype', value_name='count')
 counts = pd.merge(adata.obs.filter(['library_id', 'mouse', 'condition'], axis=1).drop_duplicates().reset_index(drop = True), counts, on='library_id')
 
 # %%
+#Median proportion of celltypes across non-NA spots per sample
 medians = ctProp.groupby(['library_id']).median().reset_index()
 medians.columns = ['library_id'] + annot['clusterAbrv'].tolist()
 medians = pd.melt(medians, id_vars='library_id', var_name='celltype', value_name='median')
@@ -62,7 +67,7 @@ colors = sns.color_palette("tab10").as_hex()[0:6]
 fig, axes = plt.subplots(1, 2 , figsize=(16, 15), dpi = 300)
 axes = axes.flatten()
 
-
+#Plot counts and medians per sample for each celltype
 for df, name, ax in zip([counts, medians], ['count', 'median'], axes):
 
     sns.boxplot(data = df, x=name, y= 'celltype', hue = 'condition', color = 'lightgrey', order=annot['clusterAbrv'].sort_values(), fliersize=0, ax=ax)

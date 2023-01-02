@@ -26,16 +26,19 @@ else:
 
 
 # %%
+#Load anndata object
 adata = sc.read_h5ad(adata_fp)
 del adata.layers['SCT']
 adata
 
 # %%
+#Do spatial plots
 if tissue == 'brain':
     with PdfPages(output_fp) as output_pdf:
         fig, axs = plt.subplots(3, 4, figsize=(23, 15))
         axs = axs.flatten()
 
+        #Loop over samples
         for i, library in enumerate(
             adata.obs.filter(['library_id','mouse'], axis = 1).drop_duplicates().sort_values('mouse')['library_id']
         ):

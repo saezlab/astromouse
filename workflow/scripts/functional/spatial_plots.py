@@ -28,20 +28,24 @@ else:
 
 
 # %%
+#Load anndata object
 adata = sc.read_h5ad(adata_fp)
 del adata.layers['SCT']
 adata
 
 # %%
+#Load spot-level data to plot
 activities = pd.read_csv(functional_fp, index_col=0, sep=',')
 activities = activities.loc[adata.obs.index,:]
 activities.columns = [re.sub("-", "", func) for func in activities.columns]
 
+#Add functional data to anndata
 adata.obsm['acts'] = activities
-acts = dc.get_acts(adata, 'acts')
+acts = dc.get_acts(adata, 'acts') #Reformat anndata
 print(acts)
 
 # %%
+#Extract upper and lower data limits across samples for each feature
 lims = pd.DataFrame({ 'llim' : [np.min(acts.X[:,ii]) for ii in range(acts.n_vars)], 'ulim': [np.max(acts.X[:,ii]) for ii in range(acts.n_vars)]}, index = acts.var_names.values)
 lims['lim'] = [np.max(abs(acts.X[:,ii])) for ii in range(acts.n_vars)]
 print('Max and min values per pathway')
@@ -50,10 +54,12 @@ print(lims)
 
 if tissue == 'brain':
     with PdfPages(output_fp) as output_pdf:
+        #Loop over features (i.e. called pathway)
         for pathway in acts.var.index.values:
             fig, axs = plt.subplots(3, 4, figsize=(23, 15))
             axs = axs.flatten()
 
+            #Loop over samples
             for i, library in enumerate(
                 acts.obs.filter(['library_id','mouse'], axis = 1).drop_duplicates().sort_values('mouse')['library_id']
                 #[os.path.basename(os.path.dirname(sample)) for sample in sample_paths]
@@ -88,6 +94,7 @@ if tissue == 'brain':
 
 if tissue == 'heart':
     with PdfPages(output_fp) as output_pdf:
+        #Loop over samples
         for library in acts.obs.filter(['library_id','mouse'], axis = 1).drop_duplicates().sort_values('library_id')['library_id']:
             #[os.path.basename(os.path.dirname(sample)) for sample in sample_paths]
             fig, axs = plt.subplots(4, 4, figsize=(23, 20))
@@ -95,6 +102,7 @@ if tissue == 'heart':
 
             ad = acts[acts.obs.library_id == library, :]#.copy()
 
+            #Loop over features (i.e. called pathway)
             for i, pathway in enumerate(acts.var.index.values):
 
                 sc.pl.spatial(

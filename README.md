@@ -32,9 +32,14 @@ You can see which steps will be executed by running:
 snakemake -n
 ```
 
-Run all steps necessary to reproduce the plots.:
+Run all steps necessary to reproduce the plots:
 ```
 snakemake --use-conda -c 4 #will run on 4 local cores
+```
+
+For a cluster with SLURM as job manager:
+```
+snakemake --profile config/slurm -j 1 #will submit only one job at a time
 ```
 
 More information about how to use and execute snakemake can be found in the [snakemake tutorial](https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html)
