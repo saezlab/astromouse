@@ -4,6 +4,7 @@ min_version("6.0")
 #config file containing parameters for the pipeline
 configfile: "config/config.yaml"
 
+#files/plots to be generated for the pipeline by default
 rule all:
     input:
         'plots/functional/brain/stereoscope_proportions.pdf',
