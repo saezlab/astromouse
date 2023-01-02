@@ -21,3 +21,23 @@ mamba create -c conda-forge -c bioconda -n snakemake snakemake
 conda activate snakemake
 ```
 
+### Run pipeline
+Snakemake takes care of installing all dependencies to the environments. Set them up by running:
+```
+snakemake --conda-create-envs-only
+```
+
+You can see which steps will be executed by running:
+```
+snakemake -n
+```
+
+Run all steps necessary to reproduce the plots.:
+```
+snakemake --use-conda -c 4 #will run on 4 local cores
+```
+
+For more information about how to use and execute snakemake can be found in the [snakemake tutorial](https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html)
+
+
+
