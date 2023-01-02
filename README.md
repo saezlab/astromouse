@@ -37,7 +37,7 @@ Run all steps necessary to reproduce the plots.:
 snakemake --use-conda -c 4 #will run on 4 local cores
 ```
 
-For more information about how to use and execute snakemake can be found in the [snakemake tutorial](https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html)
+More information about how to use and execute snakemake can be found in the [snakemake tutorial](https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html)
 
 
 
