@@ -3,7 +3,7 @@ from glob import glob
 # extract individual MO assays from a seurat object
 rule MO_seurat_to_h5ad:
     input:
-        data = 'data/original/MO/MO_{tissue}_annotated.rds'
+        data = 'data/original/MO/MO_{tissue}_annotated.RData'
     output:
         h5ad = directory('results/MO/{tissue}')
     resources:

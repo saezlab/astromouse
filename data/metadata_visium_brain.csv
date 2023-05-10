@@ -1,0 +1,13 @@
+sample_no,sample_name,sub_array,condition,mice_id/bio_origin
+1,Sample_158,A1,Flight,CF2_B
+2,Sample_158,B1,Flight,CF2_B
+3,Sample_158,C1,Flight,CF7_B
+4,Sample_158,D1,Flight,CF7_B
+5,Sample_159,A1,Ground,CG7_B
+6,Sample_159,B1,Ground,CG7_B
+7,Sample_159,C1,Flight,CF1_B
+8,Sample_159,D1,Flight,CF1_B
+9,Sample_304,A1,Ground,CG9_B
+10,Sample_304,B1,Ground,CG9_B
+11,Sample_304,C1,Ground,CG8_B
+12,Sample_304,D1,Ground,CG8_B

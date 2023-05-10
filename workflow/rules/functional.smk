@@ -48,7 +48,7 @@ rule plot_spatial_stereoscope:
     input:
         adata = 'results/ST/{tissue}_wImages.h5ad',
         functional = 'results/ST/ST_{tissue}_deconvoluted.csv',
-        annotations = 'data/original/MO/MO_cluster_metadata.csv'
+        annotations = 'data/MO_cluster_metadata.csv'
     params:
         cellprop_cutoff = config['deconvolution'].get('cellprop_cutoff')
     output:
@@ -63,7 +63,7 @@ rule plot_stereoscope:
     input:
         adata = 'results/ST/{tissue}_wImages.h5ad',
         functional = 'results/ST/ST_{tissue}_deconvoluted.csv',
-        annotations = 'data/original/MO/MO_cluster_metadata.csv'
+        annotations = 'data/MO_cluster_metadata.csv'
     params:
         cellprop_cutoff = 0.1
     output:

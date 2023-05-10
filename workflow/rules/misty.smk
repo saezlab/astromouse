@@ -118,8 +118,8 @@ rule run_views:
 #analytical plots of the Misty models pooled across samples and conditions
 rule plot_misty_results:
     input:
-        'data/original/ST/metadata_visium_{tissue}.csv',
-        'data/original/MO/MO_cluster_metadata.csv',
+        'data/metadata_visium_{tissue}.csv',
+        'data/MO_cluster_metadata.csv',
         lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/models/{sample}', sample = config['samples'][w.tissue])
     output: 
         'plots/Misty/{tissue}/{view_type}_misty.pdf',
@@ -141,7 +141,7 @@ rule plot_misty_results:
 #extract interactions that are condition specific
 rule get_dif_interactions:
     input:
-        'data/original/ST/metadata_visium_{tissue}.csv',
+        'data/metadata_visium_{tissue}.csv',
         lambda w: expand('results/ST/Misty/{{tissue}}/{{view_type}}/models/{sample}', sample = config['samples'][w.tissue])
     output: 
         'results/Misty/{tissue}/{view_type}_importances.csv',
@@ -186,7 +186,7 @@ def dif_interactions_inputs(wildcards):
             }
     if (wildcards.view_type in ['celltype', 'pathwaysCT', 'CTpathways']):
         files['cellprops'] = 'results/ST/ST_{wildcards.tissue}_deconvoluted.csv'.format(wildcards=wildcards)
-        files['cell_annot'] = 'data/original/MO/MO_cluster_metadata.csv'
+        files['cell_annot'] = 'data/MO_cluster_metadata.csv'
 
     if (wildcards.view_type in ['functional', 'pathwaysCT', 'CTpathways']):
         files['pathways'] = 'results/ST/functional/{wildcards.tissue}_activities_pathways.csv'.format(wildcards=wildcards)
@@ -251,7 +251,7 @@ rule TF_pathway_spatial_plots:
         pathway_paras = 'results/ST/Misty/{tissue}/CTpathways/paraviews.csv',
         TFs = 'results/ST/functional/{tissue}_activities_GRNs.csv',
         cellProp = 'results/ST/ST_{tissue}_deconvoluted.csv',
-        ct_annot = 'data/original/MO/MO_cluster_metadata.csv',
+        ct_annot = 'data/MO_cluster_metadata.csv',
         ttests = 'results/Misty/{tissue}/interactions_TFPathway_ttests.csv',
         corrs = 'results/Misty/{tissue}/interactions_TFPathway_corrs.csv'
     params:

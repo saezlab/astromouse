@@ -10,7 +10,13 @@ if(exists("snakemake")){
   output_fp <- "data/working/MO/MO_brain_annotated"
 }
 
-data <- readRDS(input_fp)
+if(grepl(".rds$", input_fp, ignore.case = TRUE)){ 
+  data <- readRDS(input_fp)
+else if (grepl(".RData$", input_fp, ignore.case = TRUE)){
+  load(input_fp)
+  data  <- seurat_multi
+  rm(seurat_multi)
+}
 
 if(grepl(".h5ad$", output_fp, ignore.case = TRUE)){
   
