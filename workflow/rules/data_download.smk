@@ -17,24 +17,10 @@ rule deconvolution:
         "(test -d data/ || mkdir data) && "
         "(test -d data/original/ || mkdir data/original) && "
         "(test -d data/original/ST/ || mkdir data/original/ST) && "
-        "(test -d temp/ || mkdir temp) && "
-        "unzip {input} deconvolution_results/sobject_brain_deconv_220609.Rds -d temp && "
-        "mv temp/deconvolution_results/sobject_brain_deconv_220609.Rds {output} && "
-        "rm -r temp/"
-
-checkpoint visium_data:
-    input:
-        HTTP.remote("data.mendeley.com/api/datasets/fjxrcbh672/draft/files/ab629966-ac1a-4b9e-8371-a739a14a859b?a=69394d54-235c-436e-be60-520cd2899517", keep_local=False)
-    output:
-        directory('data/original/ST/visium_data_brain')
-    shell:
-        "(test -d data/ || mkdir data) && "
-        "(test -d data/original/ || mkdir data/original) && "
-        "(test -d data/original/ST/ || mkdir data/original/ST) && "
-        "(test -d temp/ || mkdir temp) && "
-        "unzip {input} 'visium_data/*' -d temp && "
-        "mv temp/visium_data {output} && "
-        "rm -r temp/"
+        "(test -d temp_dec/ || mkdir temp_dec) && "
+        "unzip {input} deconvolution_results/sobject_brain_deconv_220609.Rds -d temp_dec && "
+        "mv temp_dec/deconvolution_results/sobject_brain_deconv_220609.Rds {output} && "
+        "rm -r temp_dec/"
 
 rule multiome_data:
     output:
@@ -43,11 +29,11 @@ rule multiome_data:
         "(test -d data/ || mkdir data) && "
         "(test -d data/original/ || mkdir data/original) && "
         "(test -d data/original/MO/ || mkdir data/original/MO) && "
-        "(test -d temp/ || mkdir temp) && "
-        "curl -L 'https://data.mendeley.com/api/datasets/fjxrcbh672/draft/files/43ae9888-e8a4-4d96-8098-48d7506b549b?a=69394d54-235c-436e-be60-520cd2899517' -o temp/MO.zip && "
-        "unzip temp/MO.zip multiomics_final_objects_metadata/seurat_data_brain_cc_2022-12-22.RData -d temp && "
-        "mv temp/multiomics_final_objects_metadata/seurat_data_brain_cc_2022-12-22.RData {output} "
-        "rm -r temp/"
+        "(test -d temp_mo/ || mkdir temp_mo) && "
+        "curl -L 'https://data.mendeley.com/api/datasets/fjxrcbh672/draft/files/43ae9888-e8a4-4d96-8098-48d7506b549b?a=69394d54-235c-436e-be60-520cd2899517' -o temp_mo/MO.zip && "
+        "unzip temp_mo/MO.zip multiomics_final_objects_metadata/seurat_data_brain_cc_2022-12-22.RData -d temp_mo && "
+        "mv temp_mo/multiomics_final_objects_metadata/seurat_data_brain_cc_2022-12-22.RData {output} &&"
+        "rm -r temp_mo/"
 
 rule ST_annotated:
     input:

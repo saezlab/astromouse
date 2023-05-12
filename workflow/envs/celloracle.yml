@@ -2,14 +2,15 @@ name: celloracle
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
   - python=3.8
+  - cmake
   - ipython
   - pip
   - ipykernel
   - ipywidgets
   - r-xml
+  - bioconductor-gviz
   - r-monocle3
   - r-remotes
   - bioconductor-rhdf5

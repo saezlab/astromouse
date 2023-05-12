@@ -8,7 +8,7 @@ configfile: "config/config.yaml"
 rule all:
     input:
         'plots/functional/brain/stereoscope_proportions.pdf',
-        expand('plots/functional/brain/{plot}.pdf', plot = ['pathways','pathway_paraviews', 'stereoscope', 'slides', 'ROIs']),
+        expand('plots/functional/brain/{plot}.pdf', plot = ['pathways','pathway_paraviews', 'stereoscope', 'slides']),
         'plots/Misty/brain/interactions_TFPathway.pdf',
         expand('plots/Misty/brain/{view_type}_diffplots.pdf', view_type = ['CTpathways', 'celltype']),
         expand('plots/Misty/brain/{view_type}_misty.pdf', view_type = ['CTpathways', 'celltype']),

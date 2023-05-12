@@ -12,7 +12,7 @@ if(exists("snakemake")){
 
 if(grepl(".rds$", input_fp, ignore.case = TRUE)){ 
   data <- readRDS(input_fp)
-else if (grepl(".RData$", input_fp, ignore.case = TRUE)){
+}else if (grepl(".RData$", input_fp, ignore.case = TRUE)){
   load(input_fp)
   data  <- seurat_multi
   rm(seurat_multi)

@@ -4,11 +4,14 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - python=3.9
+  - python
   - cython
   - ipython
-  - scanpy=1.9.1
-  - loompy=3.0.6
+  - numpy<1.24
+  - numba
+  - matplotlib<3.7
+  - scanpy
+  - loompy
   - python-igraph
   - louvain>=0.6,!=0.6.2
   - fa2
@@ -24,7 +27,8 @@ dependencies:
     - muon
     - pysam
     - mofapy2
-    - decoupler
+    - git+https://github.com/saezlab/decoupler-py.git
+    - git+https://github.com/saezlab/pypath@3d28c5f7c8fab1bff9b353a6e4f86bd1cc33738d
     - omnipath
     - git+https://github.com/settylab/Palantir@removeTSNE
     - git+https://github.com/dpeerlab/SEACells

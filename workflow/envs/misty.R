@@ -1,1 +1,3 @@
-devtools::install_github("saezlab/mistyR")
+remotes::install_github("saezlab/mistyR", upgrade = "never")
+
+library(mistyR)
