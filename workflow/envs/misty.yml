@@ -6,8 +6,8 @@ channels:
 dependencies:
   - r-base>=4.1
   - r-devtools
-  - r-tidyverse
-  - r-stringi
+  - r-tidyverse<4.0
+  - r-stringi<1.7.6
   - r-filelock
   - r-purrr
   - r-distances
