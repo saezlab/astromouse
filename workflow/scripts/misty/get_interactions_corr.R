@@ -60,6 +60,13 @@ output <- targets %>%   map_dfr(function(target){
   }else{
     temp.views <- misty.views
   }
+
+  if(view_type == 'CTpathways'){
+    print(colnames(temp.views$intra_act$data))
+    colnames(temp.views$intra_act$data)  <- gsub("-", "", colnames(temp.views$intra_act$data))
+    colnames(temp.views$paraview$data)  <- gsub("-", "", colnames(temp.views$paraview$data))
+    print(colnames(temp.views$intra_act$data))
+  }
   
   inter_cor <- current.inter %>% pull(.data$view) %>% unique() %>% map_dfr(function(current.view){
     

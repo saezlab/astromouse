@@ -4,31 +4,32 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - python
+  - python=3.9.13
   - cython
-  - ipython
-  - numpy<1.24
-  - numba
-  - matplotlib<3.7
-  - scanpy
-  - loompy
+  - ipython=8.6.0
+  - scanpy=1.9.1
+  - loompy=3.0.6
+  - numpy=1.23.4
+  - numba=0.56.3
+  - scikit-learn=1.1.3
   - python-igraph
   - louvain>=0.6,!=0.6.2
+  - matplotlib<3.7
   - fa2
   - leidenalg
-  - seaborn
-  - pip
+  - seaborn=0.12.1
+  - pip=22.3.1
   - ipykernel
   - ipywidgets
   - genomepy
   - harmonypy
   - pip:
-    - dfply
-    - muon
-    - pysam
-    - mofapy2
-    - git+https://github.com/saezlab/decoupler-py.git
-    - git+https://github.com/saezlab/pypath@3d28c5f7c8fab1bff9b353a6e4f86bd1cc33738d
-    - omnipath
+    - dfply==0.3.3
+    - muon==0.1.2
+    - pysam==0.20.0
+    - mofapy2==0.6.7
+    - sklearn==0.0.post1
+    - decoupler==1.2.0
+    - omnipath==1.0.5
     - git+https://github.com/settylab/Palantir@removeTSNE
-    - git+https://github.com/dpeerlab/SEACells
+    - git+https://github.com/dpeerlab/SEACells@3151a71

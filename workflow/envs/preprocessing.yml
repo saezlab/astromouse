@@ -6,9 +6,9 @@ channels:
 dependencies:
   - r
   - r-devtools
-  - r-tidyverse
+  - r-tidyverse<=1.3.2
   - r-seurat
-  - r-compositions
+  - r-compositions<=2.0_4
   - bioconductor-singlecellexperiment 
   - bioconductor-zellkonverter
   - r-seuratobject

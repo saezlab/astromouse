@@ -13,10 +13,10 @@ rule all:
         expand('plots/Misty/brain/{view_type}_diffplots.pdf', view_type = ['CTpathways', 'celltype']),
         expand('plots/Misty/brain/{view_type}_misty.pdf', view_type = ['CTpathways', 'celltype']),
 
-module data_download:
-    snakefile: "rules/data_download.smk"
-    config: config
-use rule * from data_download as DD_*
+# module data_download:
+#     snakefile: "rules/data_download.smk"
+#     config: config
+# use rule * from data_download as DD_*
 
 #module to preprocess multiome and Visium data
 #from raw cellranger output (for images)

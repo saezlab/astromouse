@@ -3,7 +3,7 @@ from glob import glob
 # extract individual MO assays from a seurat object
 rule MO_seurat_to_h5ad:
     input:
-        data = 'data/original/MO/MO_{tissue}_annotated.RData'
+        data = 'data/original/MO/MO_{tissue}_annotated.rds'
     output:
         h5ad = directory('results/MO/{tissue}')
     resources:
@@ -68,23 +68,23 @@ rule ST_extract_deconv:
     script:
         "../scripts/preprocessing/RDS_to_h5ad.R"
 
-from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
-HTTP = HTTPRemoteProvider()
+# from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+# HTTP = HTTPRemoteProvider()
 
-# download spaceranger output for visium slides
-checkpoint visium_data:
-    input:
-        HTTP.remote("data.mendeley.com/api/datasets/fjxrcbh672/draft/files/ab629966-ac1a-4b9e-8371-a739a14a859b?a=69394d54-235c-436e-be60-520cd2899517", keep_local=False)
-    output:
-        directory('data/original/ST/visium_data_brain/')
-    shell:
-        "(test -d data/ || mkdir data) && "
-        "(test -d data/original/ || mkdir data/original) && "
-        "(test -d data/original/ST/ || mkdir data/original/ST) && "
-        "(test -d temp_vis/ || mkdir temp_vis) && "
-        "unzip {input} 'visium_data/*' -d temp_vis && "
-        "mv temp_vis/visium_data {output} && "
-        "rm -r temp_vis/"
+# # download spaceranger output for visium slides
+# checkpoint visium_data:
+#     input:
+#         HTTP.remote("data.mendeley.com/api/datasets/fjxrcbh672/draft/files/ab629966-ac1a-4b9e-8371-a739a14a859b?a=69394d54-235c-436e-be60-520cd2899517", keep_local=False)
+#     output:
+#         directory('data/original/ST/visium_data_brain/')
+#     shell:
+#         "(test -d data/ || mkdir data) && "
+#         "(test -d data/original/ || mkdir data/original) && "
+#         "(test -d data/original/ST/ || mkdir data/original/ST) && "
+#         "(test -d temp_vis/ || mkdir temp_vis) && "
+#         "unzip {input} 'visium_data/*' -d temp_vis && "
+#         "mv temp_vis/visium_data {output} && "
+#         "rm -r temp_vis/"
 
 
 # Combines the ST data into one AnnData object
@@ -92,8 +92,9 @@ checkpoint visium_data:
 # the .X matrix contains counts based on the provided Seurat object, with spots and genes filtered
 # the SCT layer countains SCT transformed data using Seurat#s SCTtransformt method
 def get_samples_from_tissue(wildcards):
-    download_output = checkpoints.visium_data.get(**wildcards).output[0]
-    folders = sorted(glob(os.path.join(download_output, '*')))
+    # download_output = checkpoints.visium_data.get(**wildcards).output[0]
+    # folders = sorted(glob(os.path.join(download_output, '*')))
+    folders = sorted(glob(os.path.join('data/original/ST/visium_data_brain/', '*')))
     sample_paths = [os.path.join(folder, 'filtered_feature_bc_matrix.h5') for folder in folders]
     return sample_paths
 
