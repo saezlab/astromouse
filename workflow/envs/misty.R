@@ -1,3 +1,4 @@
-remotes::install_github("saezlab/mistyR", upgrade = "never", ref = "4b335c20295d08f2fb88025e9c6927a88dc71ade")
+remotes::install_version('deldir', version = '1.0-6', upgrade = "never", repos = "http://cran.us.r-project.org")
+remotes::install_github("saezlab/mistyR", upgrade = "never", ref = "65eb11a4229a6e2b933603cd81de59b3316efe39")
 
 library(mistyR)

@@ -4,6 +4,8 @@ library(ggplot2)
 library(mistyR)
 library(factoextra)
 
+options(dplyr.legacy_locale = TRUE)
+
 
 extract_contrast_interactions <- function (misty.results.from, misty.results.to, 
                                            views = NULL, cutoff.from = 1, cutoff.to = 1, 

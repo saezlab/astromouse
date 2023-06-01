@@ -10,7 +10,6 @@ dependencies:
   - ipykernel
   - ipywidgets
   - r-xml
-  - bioconductor-gviz
   - r-monocle3
   - r-remotes
   - bioconductor-rhdf5

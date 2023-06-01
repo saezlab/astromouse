@@ -3,6 +3,8 @@ library(dplyr)
 library(ggplot2)
 library(mistyR)
 
+options(dplyr.legacy_locale = TRUE)
+
 # helpers -----------------------------------------------------------------
 
 
