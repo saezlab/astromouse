@@ -22,6 +22,13 @@ barcodes <- indata$mod$atac$obs$`_index`
 peaks <- indata$mod$atac$var$`_index`
 h5closeAll()
 
+# Read genome
+if (organism == 'human'){
+    genome <- read.table('resources/genome_sizes/human.txt')
+} else {
+    genome <- read.table('resources/genome_sizes/mouse.txt')
+}
+
 # Build sparse matrix and binarize
 indata <- t(Matrix::sparseMatrix(i=indices, p=indptr, x=data, index1 = FALSE))
 indata@x[indata@x > 0] <- 1
@@ -69,15 +76,6 @@ umap_coords <- reducedDims(input_cds)$UMAP
 
 # Build cicero cds
 cicero_cds <- make_cicero_cds(input_cds, reduced_coordinates = umap_coords)
-
-# Determine genome
-if (organism == 'human'){
-    data("human.hg19.genome")
-    genome <- human.hg19.genome
-} else if (organism == 'mouse'){
-    data("mouse.mm9.genome")
-    genome <- mouse.mm9.genome
-}
 
 # Run the main function
 conns <- run_cicero(cicero_cds, genome) # Takes a few minutes to run
