@@ -9,7 +9,9 @@ local-cores: 16
 latency-wait: 60
 use-conda: True
 use-envmodules: True
+use-singularity: True
 jobs: 1
 default-resources:
-    - runtime=14400
+    - runtime=7200
     - mem_mb=16000
+    - partition='single'
