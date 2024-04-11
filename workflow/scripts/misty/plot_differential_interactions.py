@@ -188,7 +188,7 @@ for key in interactions.keys():
                 if row['p.adj'] > significance_threshold: 
                     pval_text = 'ns = ' + pval_text
                 else: 
-                    pval_text = 'sig = ' + pval_text
+                    pval_text = 'p.adj = ' + pval_text
                 axs[idx[0]].text((x1+x2)*.5, y+h, pval_text, ha='center', va='bottom', color=col)
 
                 if tissue == 'brain':
