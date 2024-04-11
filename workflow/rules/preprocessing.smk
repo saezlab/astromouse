@@ -1,56 +1,60 @@
 from glob import glob
 
 # extract individual MO assays from a seurat object
-rule MO_seurat_to_h5ad:
+rule MO_seurat_to_h5:
     input:
         data = 'data/original/MO/MO_{tissue}_annotated.RData'
     output:
-        h5ad = directory('results/MO/{tissue}')
+        h5 = temp('results/MO/{tissue}.h5')
+    params:
+        modality = 'MO'
     resources:
         mem_mb=30000
     conda:
         "../envs/preprocessing.yml"
     script:
-        "../scripts/preprocessing/RDS_to_h5ad.R"
+        "../scripts/preprocessing/RDS_to_h5.R"
 
 # creates a mudata object with three assays: rna, atac and chromvar
-# rna has counts in .X, and SCT / SCT_CC normalised data in respective layers
+# rna has counts in .X
 # atac has only counts
 # chromvar also
-rule MO_h5ad_to_h5mu:
+rule MO_h5_to_h5mu:
     input:
-        rules.MO_seurat_to_h5ad.output
+        h5 = 'results/MO/{tissue}.h5'
     output:
         muad = 'results/MO/{tissue}.h5mu'
     conda:
         "../envs/astromouse.yml"
     script:
-        "../scripts/preprocessing/MO_to_mudata.py"
+        "../scripts/preprocessing/h5_to_mudata.py"
 
 # extract ST assays from seurat object
-rule ST_seurat_to_h5ad:
+rule ST_seurat_to_h5:
     input:
         data = 'data/original/ST/ST_{tissue}_annotated.rds'
     output:
-        h5ad = temp(directory('results/ST/convert/{tissue}_annotated'))
+        h5 = temp('results/ST/{tissue}.h5')
+    params:
+        modality = 'ST'
     resources:
         mem_mb=50000,
         disk_mb=20000
     conda:
         "../envs/preprocessing.yml"
     script:
-        "../scripts/preprocessing/RDS_to_h5ad.R"
+        "../scripts/preprocessing/RDS_to_h5.R"
 
 # combine assays (previously in Seurat objects) into Anndata
-rule ST_combine_to_h5ad:
+rule ST_h5_to_h5ad:
     input:
-        rules.ST_seurat_to_h5ad.output
+        'results/ST/{tissue}.h5'
     output:
         ad = temp('results/ST/convert/{tissue}.h5ad')
     conda:
         "../envs/astromouse.yml"
     script:
-        "../scripts/preprocessing/ST_to_adata.py"
+        "../scripts/preprocessing/h5_to_h5ad.py"
 
 # extract stereoscope deconvolution from Seurat to .csv
 rule ST_extract_deconv:
